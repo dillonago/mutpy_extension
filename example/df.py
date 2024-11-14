@@ -25,3 +25,17 @@ def drop_column_copy(df, column_name):
     pd.DataFrame: A new DataFrame with the column dropped.
     """
     return df.drop(columns=[column_name], inplace=False)
+
+
+def fillna_inplace(df, value):
+    return df.fillna(value, inplace=True)
+
+def fillna_copy(df, value):
+    return df.fillna(value, inplace=False)
+
+
+def sort_values_inplace(df, by):
+    return df.sort_values(by=by, inplace=True)
+    
+def sort_values_copy(df, by):
+    return df.sort_values(by=by, inplace=False)
