@@ -5,6 +5,18 @@ from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
 from mutpy.operators.base import MutationOperator, MutationResign
 
 
+class ArgumentValueChanger(MutationOperator):
+    def mutate_Call(self, node):
+        # Look for keyword arguments with the target name
+        for keyword in node.keywords:
+            if keyword.arg == "inplace":
+                # Replace the value with the new value
+                v = not keyword.value
+                keyword.value = ast.Constant(value=v)
+                return node  # Return the modified node
+        # No matching argument found, skip mutation
+        raise MutationResign()
+
 class AssignmentOperatorReplacement(AbstractArithmeticOperatorReplacement):
     def should_mutate(self, node):
         return isinstance(node.parent, ast.AugAssign)
