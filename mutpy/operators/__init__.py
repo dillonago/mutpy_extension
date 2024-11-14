@@ -13,6 +13,7 @@ SuperCallingInsert = utils.get_by_python_version([
 ])
 
 standard_operators = {
+    ArgumentValueChanger,
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,
