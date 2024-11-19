@@ -174,6 +174,7 @@ class BaseTestRunner:
         timer.stop()
         return result, timer.duration
 
+    # Need to fix here
     def run_mutation_test_runner(self, suite, total_duration):
         live_time = self.timeout_factor * (total_duration if total_duration > 1 else 1)
         test_runner_class = utils.get_mutation_test_runner_class()
@@ -181,6 +182,7 @@ class BaseTestRunner:
         with self.stdout_manager:
             test_runner.start()
             result = test_runner.get_result(live_time)
+            # print(result)
             test_runner.terminate()
         return result
 
@@ -193,7 +195,7 @@ class BaseTestRunner:
         with self.stdout_manager:
             coverage_result = suite.run_with_coverage(coverage_injector=coverage_injector)
         return coverage_injector, coverage_result
-
+        
     def run_test(self, test_module, target_test):
         suite = self.create_empty_test_suite()
         suite.add_tests(test_module, target_test)
