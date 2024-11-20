@@ -75,8 +75,10 @@ class MutationController(views.ViewNotifier):
     def run_mutation_process(self):
         try:
             test_modules, total_duration, number_of_tests = self.load_and_check_tests()
+            # print(test_modules)
 
             self.notify_passed(test_modules, number_of_tests)
+            # print("here")
             self.notify_start()
 
             self.score = MutationScore()
@@ -118,6 +120,9 @@ class MutationController(views.ViewNotifier):
                 continue
             self.notify_mutation(mutation_number, mutations, target_module, mutant_ast)
             mutant_module = self.create_mutant_module(target_module, mutant_ast)
+            import ast
+            import pprint
+            # pprint.pprint(ast.dump(mutant_ast))
             if mutant_module:
                 # Mutations
                 # print(mutations[0].visitor)
@@ -137,6 +142,8 @@ class MutationController(views.ViewNotifier):
     def create_mutant_module(self, target_module, mutant_ast):
         try:
             with self.stdout_manager:
+                import pprint, ast
+                # pprint.pprint(ast.dump(mutant_ast))
                 return utils.create_module(
                     ast_node=mutant_ast,
                     module_name=target_module.__name__
@@ -146,6 +153,8 @@ class MutationController(views.ViewNotifier):
             return None
 
     def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
+        # print(mutations[0])
+        # print(mutant_module)
         result, duration = self.runner.run_tests_with_mutant(total_duration, mutant_module, mutations, coverage_result)
         self.update_score_and_notify_views(result, duration)
 

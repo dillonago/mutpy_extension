@@ -167,6 +167,7 @@ class BaseTestRunner:
     @utils.TimeRegister
     def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
         suite = self.create_test_suite(mutant_module)
+        # print(coverage_result)
         if coverage_result:
             self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
         timer = utils.Timer()
@@ -224,3 +225,4 @@ class BaseTestRunner:
             if test_id in coverage_result.test_covered_nodes and mutated_nodes.isdisjoint(
                     coverage_result.test_covered_nodes[test_id]):
                 suite.skip_test(test)
+                print(f"Skipped test", test)

@@ -24,6 +24,8 @@ from threading import Thread
 
 
 def create_module(ast_node, module_name='mutant', module_dict=None):
+    import pprint, ast
+    pprint.pprint(ast.dump(ast_node))
     code = compile(ast_node, module_name, 'exec')
     module = types.ModuleType(module_name)
     module.__dict__.update(module_dict or {})
