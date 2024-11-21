@@ -1,10 +1,15 @@
 import unittest
 
-from mutpy.test_runners.base import CoverageTestResult, BaseTestSuite, BaseTestRunner, MutationTestResult, BaseTest
+from mutpy.test_runners.base import (
+    CoverageTestResult,
+    BaseTestSuite,
+    BaseTestRunner,
+    MutationTestResult,
+    BaseTest,
+)
 
 
 class UnittestMutationTestResult(unittest.TestResult):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type_error = None
@@ -43,15 +48,19 @@ class UnittestMutationTestResult(unittest.TestResult):
 
     def _add_latest_failure(self):
         failure = self.failures[-1]
-        self.mutation_test_result.add_failed(str(failure[0]), self._get_short_message(failure[1]), failure[1])
+        self.mutation_test_result.add_failed(
+            str(failure[0]), self._get_short_message(failure[1]), failure[1]
+        )
 
     def _add_latest_error(self):
         failure = self.errors[-1]
-        self.mutation_test_result.add_failed(str(failure[0]), self._get_short_message(failure[1]), failure[1])
+        self.mutation_test_result.add_failed(
+            str(failure[0]), self._get_short_message(failure[1]), failure[1]
+        )
 
     def _add_latest_unexpected_success(self):
         failure = self.unexpectedSuccesses[-1]
-        self.mutation_test_result.add_failed(str(failure[0]), 'Unexpected success')
+        self.mutation_test_result.add_failed(str(failure[0]), "Unexpected success")
 
     def _add_latest_skip(self):
         skip = self.skipped[-1]
@@ -63,7 +72,6 @@ class UnittestMutationTestResult(unittest.TestResult):
 
 
 class UnittestCoverageResult(CoverageTestResult, unittest.TestResult):
-
     def startTest(self, test):
         super().startTest(test)
         self.start_measure_coverage()
@@ -74,7 +82,6 @@ class UnittestCoverageResult(CoverageTestResult, unittest.TestResult):
 
 
 class UnittestTestSuite(BaseTestSuite):
-
     def __init__(self):
         self.suite = unittest.TestSuite()
 
@@ -82,9 +89,14 @@ class UnittestTestSuite(BaseTestSuite):
         self.suite.addTests(self.load_tests(test_module, target_test))
 
     def skip_test(self, test):
-        test_method = getattr(test.internal_test_obj, test.internal_test_obj._testMethodName)
-        setattr(test.internal_test_obj, test.internal_test_obj._testMethodName,
-                unittest.skip('not covered')(test_method))
+        test_method = getattr(
+            test.internal_test_obj, test.internal_test_obj._testMethodName
+        )
+        setattr(
+            test.internal_test_obj,
+            test.internal_test_obj._testMethodName,
+            unittest.skip("not covered")(test_method),
+        )
 
     def run(self):
         result = UnittestMutationTestResult()
@@ -115,7 +127,6 @@ class UnittestTestSuite(BaseTestSuite):
 
 
 class UnittestTest(BaseTest):
-
     def __repr__(self):
         return repr(self.internal_test_obj)
 

@@ -1,18 +1,15 @@
 import random
 import sys
-import time
 
 from mutpy import views, utils
 
 
 class TestsFailAtOriginal(Exception):
-
     def __init__(self, result=None):
         self.result = result
 
 
 class MutationScore:
-
     def __init__(self):
         self.killed_mutants = 0
         self.timeout_mutants = 0
@@ -23,7 +20,11 @@ class MutationScore:
 
     def count(self):
         bottom = self.all_mutants - self.incompetent_mutants
-        return (((self.killed_mutants + self.timeout_mutants) / bottom) * 100) if bottom else 0
+        return (
+            (((self.killed_mutants + self.timeout_mutants) / bottom) * 100)
+            if bottom
+            else 0
+        )
 
     def inc_killed(self):
         self.killed_mutants += 1
@@ -43,13 +44,27 @@ class MutationScore:
 
     @property
     def all_mutants(self):
-        return self.killed_mutants + self.timeout_mutants + self.incompetent_mutants + self.survived_mutants
+        return (
+            self.killed_mutants
+            + self.timeout_mutants
+            + self.incompetent_mutants
+            + self.survived_mutants
+        )
 
 
 class MutationController(views.ViewNotifier):
-
-    def __init__(self, runner_cls, target_loader, test_loader, views, mutant_generator,
-                 timeout_factor=5, disable_stdout=False, mutate_covered=False, mutation_number=None):
+    def __init__(
+        self,
+        runner_cls,
+        target_loader,
+        test_loader,
+        views,
+        mutant_generator,
+        timeout_factor=5,
+        disable_stdout=False,
+        mutate_covered=False,
+        mutation_number=None,
+    ):
         super().__init__(views)
         self.target_loader = target_loader
         self.test_loader = test_loader
@@ -57,7 +72,9 @@ class MutationController(views.ViewNotifier):
         self.timeout_factor = timeout_factor
         self.stdout_manager = utils.StdoutManager(disable_stdout)
         self.mutation_number = mutation_number
-        self.runner = runner_cls(self.test_loader, self.timeout_factor, self.stdout_manager, mutate_covered)
+        self.runner = runner_cls(
+            self.test_loader, self.timeout_factor, self.stdout_manager, mutate_covered
+        )
 
     def run(self):
         self.notify_initialize(self.target_loader.names, self.test_loader.names)
@@ -81,7 +98,9 @@ class MutationController(views.ViewNotifier):
 
             self.score = MutationScore()
 
-            for target_module, to_mutate in self.target_loader.load([module for module, *_ in test_modules]):
+            for target_module, to_mutate in self.target_loader.load(
+                [module for module, *_ in test_modules]
+            ):
                 self.mutate_module(target_module, to_mutate, total_duration)
         except KeyboardInterrupt:
             pass
@@ -107,11 +126,14 @@ class MutationController(views.ViewNotifier):
     @utils.TimeRegister
     def mutate_module(self, target_module, to_mutate, total_duration):
         target_ast = self.create_target_ast(target_module)
-        coverage_injector, coverage_result = self.inject_coverage(target_ast, target_module)
+        coverage_injector, coverage_result = self.inject_coverage(
+            target_ast, target_module
+        )
         if coverage_injector:
             self.score.update_coverage(*coverage_injector.get_result())
-        for mutations, mutant_ast in self.mutant_generator.mutate(target_ast, to_mutate, coverage_injector,
-                                                                  module=target_module):
+        for mutations, mutant_ast in self.mutant_generator.mutate(
+            target_ast, to_mutate, coverage_injector, module=target_module
+        ):
             mutation_number = self.score.all_mutants + 1
             if self.mutation_number and self.mutation_number != mutation_number:
                 self.score.inc_incompetent()
@@ -119,7 +141,9 @@ class MutationController(views.ViewNotifier):
             self.notify_mutation(mutation_number, mutations, target_module, mutant_ast)
             mutant_module = self.create_mutant_module(target_module, mutant_ast)
             if mutant_module:
-                self.run_tests_with_mutant(total_duration, mutant_module, mutations, coverage_result)
+                self.run_tests_with_mutant(
+                    total_duration, mutant_module, mutations, coverage_result
+                )
             else:
                 self.score.inc_incompetent()
 
@@ -136,15 +160,18 @@ class MutationController(views.ViewNotifier):
         try:
             with self.stdout_manager:
                 return utils.create_module(
-                    ast_node=mutant_ast,
-                    module_name=target_module.__name__
+                    ast_node=mutant_ast, module_name=target_module.__name__
                 )
         except BaseException as exception:
             self.notify_incompetent(0, exception, tests_run=0)
             return None
 
-    def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
-        result, duration = self.runner.run_tests_with_mutant(total_duration, mutant_module, mutations, coverage_result)
+    def run_tests_with_mutant(
+        self, total_duration, mutant_module, mutations, coverage_result
+    ):
+        result, duration = self.runner.run_tests_with_mutant(
+            total_duration, mutant_module, mutations, coverage_result
+        )
         self.update_score_and_notify_views(result, duration)
 
     def update_score_and_notify_views(self, result, mutant_duration):
@@ -170,27 +197,35 @@ class MutationController(views.ViewNotifier):
         self.score.inc_survived()
 
     def update_killed_mutant(self, result, duration):
-        self.notify_killed(duration, result.killer, result.exception_traceback, result.tests_run)
+        self.notify_killed(
+            duration, result.killer, result.exception_traceback, result.tests_run
+        )
         self.score.inc_killed()
 
 
 class HOMStrategy:
-
     def __init__(self, order=2):
         self.order = order
 
-    def remove_bad_mutations(self, mutations_to_apply, available_mutations, allow_same_operators=True):
+    def remove_bad_mutations(
+        self, mutations_to_apply, available_mutations, allow_same_operators=True
+    ):
         for mutation_to_apply in mutations_to_apply:
             for available_mutation in available_mutations[:]:
-                if mutation_to_apply.node == available_mutation.node or \
-                        mutation_to_apply.node in available_mutation.node.children or \
-                        available_mutation.node in mutation_to_apply.node.children or \
-                        (not allow_same_operators and mutation_to_apply.operator == available_mutation.operator):
+                if (
+                    mutation_to_apply.node == available_mutation.node
+                    or mutation_to_apply.node in available_mutation.node.children
+                    or available_mutation.node in mutation_to_apply.node.children
+                    or (
+                        not allow_same_operators
+                        and mutation_to_apply.operator == available_mutation.operator
+                    )
+                ):
                     available_mutations.remove(available_mutation)
 
 
 class FirstToLastHOMStrategy(HOMStrategy):
-    name = 'FIRST_TO_LAST'
+    name = "FIRST_TO_LAST"
 
     def generate(self, mutations):
         mutations = mutations[:]
@@ -211,7 +246,7 @@ class FirstToLastHOMStrategy(HOMStrategy):
 
 
 class EachChoiceHOMStrategy(HOMStrategy):
-    name = 'EACH_CHOICE'
+    name = "EACH_CHOICE"
 
     def generate(self, mutations):
         mutations = mutations[:]
@@ -230,7 +265,7 @@ class EachChoiceHOMStrategy(HOMStrategy):
 
 
 class BetweenOperatorsHOMStrategy(HOMStrategy):
-    name = 'BETWEEN_OPERATORS'
+    name = "BETWEEN_OPERATORS"
 
     def generate(self, mutations):
         usage = {mutation: 0 for mutation in mutations}
@@ -245,12 +280,14 @@ class BetweenOperatorsHOMStrategy(HOMStrategy):
                 if not usage[mutation]:
                     not_used.remove(mutation)
                 usage[mutation] += 1
-                self.remove_bad_mutations(mutations_to_apply, available_mutations, allow_same_operators=False)
+                self.remove_bad_mutations(
+                    mutations_to_apply, available_mutations, allow_same_operators=False
+                )
             yield mutations_to_apply
 
 
 class RandomHOMStrategy(HOMStrategy):
-    name = 'RANDOM'
+    name = "RANDOM"
 
     def __init__(self, *args, shuffler=random.shuffle, **kwargs):
         super().__init__(*args, **kwargs)
@@ -282,25 +319,27 @@ hom_strategies = [
 
 
 class FirstOrderMutator:
-
     def __init__(self, operators, percentage=100):
         self.operators = operators
         self.sampler = utils.RandomSampler(percentage)
 
     def mutate(self, target_ast, to_mutate=None, coverage_injector=None, module=None):
         for op in utils.sort_operators(self.operators):
-            for mutation, mutant in op().mutate(target_ast, to_mutate, self.sampler, coverage_injector, module=module):
+            for mutation, mutant in op().mutate(
+                target_ast, to_mutate, self.sampler, coverage_injector, module=module
+            ):
                 yield [mutation], mutant
 
 
 class HighOrderMutator(FirstOrderMutator):
-
     def __init__(self, *args, hom_strategy=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.hom_strategy = hom_strategy or FirstToLastHOMStrategy(order=2)
 
     def mutate(self, target_ast, to_mutate=None, coverage_injector=None, module=None):
-        mutations = self.generate_all_mutations(coverage_injector, module, target_ast, to_mutate)
+        mutations = self.generate_all_mutations(
+            coverage_injector, module, target_ast, to_mutate
+        )
         for mutations_to_apply in self.hom_strategy.generate(mutations):
             generators = []
             applied_mutations = []
@@ -317,7 +356,7 @@ class HighOrderMutator(FirstOrderMutator):
                 try:
                     new_mutation, mutant = generator.__next__()
                 except StopIteration:
-                    assert False, 'no mutations!'
+                    assert False, "no mutations!"
                 applied_mutations.append(new_mutation)
                 generators.append(generator)
             yield applied_mutations, mutant
@@ -326,7 +365,9 @@ class HighOrderMutator(FirstOrderMutator):
     def generate_all_mutations(self, coverage_injector, module, target_ast, to_mutate):
         mutations = []
         for op in utils.sort_operators(self.operators):
-            for mutation, _ in op().mutate(target_ast, to_mutate, None, coverage_injector, module=module):
+            for mutation, _ in op().mutate(
+                target_ast, to_mutate, None, coverage_injector, module=module
+            ):
                 mutations.append(mutation)
         return mutations
 
@@ -336,4 +377,4 @@ class HighOrderMutator(FirstOrderMutator):
                 generator.__next__()
             except StopIteration:
                 continue
-            assert False, 'too many mutations!'
+            assert False, "too many mutations!"

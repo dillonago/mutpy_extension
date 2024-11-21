@@ -1,6 +1,10 @@
 import ast
 
-from mutpy.operators.base import MutationOperator, AbstractUnaryOperatorDeletion, copy_node
+from mutpy.operators.base import (
+    MutationOperator,
+    AbstractUnaryOperatorDeletion,
+    copy_node,
+)
 
 
 class ConditionalOperatorDeletion(AbstractUnaryOperatorDeletion):

@@ -18,28 +18,52 @@ class Mutation:
 
 def copy_node(mutate):
     def f(self, node):
-        copied_node = copy.deepcopy(node, memo={
-            id(node.parent): node.parent,
-        })
+        copied_node = copy.deepcopy(
+            node,
+            memo={
+                id(node.parent): node.parent,
+            },
+        )
         return mutate(self, copied_node)
 
     return f
 
 
 class MutationOperator:
-    def mutate(self, node, to_mutate=None, sampler=None, coverage_injector=None, module=None, only_mutation=None):
+    def mutate(
+        self,
+        node,
+        to_mutate=None,
+        sampler=None,
+        coverage_injector=None,
+        module=None,
+        only_mutation=None,
+    ):
         self.to_mutate = to_mutate
         self.sampler = sampler
         self.only_mutation = only_mutation
         self.coverage_injector = coverage_injector
         self.module = module
         for new_node in self.visit(node):
-            yield Mutation(operator=self.__class__, node=self.current_node, visitor=self.visitor), new_node
+            yield (
+                Mutation(
+                    operator=self.__class__,
+                    node=self.current_node,
+                    visitor=self.visitor,
+                ),
+                new_node,
+            )
 
     def visit(self, node):
-        if self.has_notmutate(node) or (self.coverage_injector and not self.coverage_injector.is_covered(node)):
+        if self.has_notmutate(node) or (
+            self.coverage_injector and not self.coverage_injector.is_covered(node)
+        ):
             return
-        if self.only_mutation and self.only_mutation.node != node and self.only_mutation.node not in node.children:
+        if (
+            self.only_mutation
+            and self.only_mutation.node != node
+            and self.only_mutation.node not in node.children
+        ):
             return
         self.fix_lineno(node)
         visitors = self.find_visitors(node)
@@ -48,8 +72,10 @@ class MutationOperator:
                 try:
                     if self.sampler and not self.sampler.is_mutation_time():
                         raise MutationResign
-                    if self.only_mutation and \
-                            (self.only_mutation.node != node or self.only_mutation.visitor != visitor.__name__):
+                    if self.only_mutation and (
+                        self.only_mutation.node != node
+                        or self.only_mutation.visitor != visitor.__name__
+                    ):
                         raise MutationResign
                     new_node = visitor(node)
                     self.visitor = visitor.__name__
@@ -84,7 +110,7 @@ class MutationOperator:
             if isinstance(value, ast.AST):
                 for new_value in self.visit(value):
                     if not isinstance(new_value, ast.AST):
-                        old_value[position:position + 1] = new_value
+                        old_value[position : position + 1] = new_value
                     elif value is None:
                         del old_value[position]
                     else:
@@ -112,20 +138,24 @@ class MutationOperator:
             return False
 
     def fix_lineno(self, node):
-        if not hasattr(node, 'lineno') and getattr(node, 'parent', None) is not None and hasattr(node.parent, 'lineno'):
+        if (
+            not hasattr(node, "lineno")
+            and getattr(node, "parent", None) is not None
+            and hasattr(node.parent, "lineno")
+        ):
             node.lineno = node.parent.lineno
 
     def fix_node_internals(self, old_node, new_node):
-        if not hasattr(new_node, 'parent'):
+        if not hasattr(new_node, "parent"):
             new_node.children = old_node.children
             new_node.parent = old_node.parent
-        if not hasattr(new_node, 'lineno') and hasattr(old_node, 'lineno'):
+        if not hasattr(new_node, "lineno") and hasattr(old_node, "lineno"):
             new_node.lineno = old_node.lineno
-        if hasattr(old_node, 'marker'):
+        if hasattr(old_node, "marker"):
             new_node.marker = old_node.marker
 
     def find_visitors(self, node):
-        method_prefix = 'mutate_' + node.__class__.__name__
+        method_prefix = "mutate_" + node.__class__.__name__
         return self.getattrs_like(method_prefix)
 
     def getattrs_like(ob, attr_like):
@@ -134,7 +164,7 @@ class MutationOperator:
 
     def set_lineno(self, node, lineno):
         for n in ast.walk(node):
-            if hasattr(n, 'lineno'):
+            if hasattr(n, "lineno"):
                 n.lineno = lineno
 
     def shift_lines(self, nodes, shift_by=1):
@@ -143,11 +173,11 @@ class MutationOperator:
 
     @classmethod
     def name(cls):
-        return ''.join([c for c in cls.__name__ if str.isupper(c)])
+        return "".join([c for c in cls.__name__ if str.isupper(c)])
 
     @classmethod
     def long_name(cls):
-        return ' '.join(map(str.lower, (re.split('([A-Z][a-z]*)', cls.__name__)[1::2])))
+        return " ".join(map(str.lower, (re.split("([A-Z][a-z]*)", cls.__name__)[1::2])))
 
 
 class AbstractUnaryOperatorDeletion(MutationOperator):

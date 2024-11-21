@@ -6,7 +6,7 @@ from mutpy.test_runners.unittest_runner import UnittestCoverageResult
 
 class MarkerNodeTransformerTest(unittest.TestCase):
     def test_visit(self):
-        node = utils.create_ast('x = y\ny = x')
+        node = utils.create_ast("x = y\ny = x")
         coverage.MarkerNodeTransformer().visit(node)
 
         y_load_node = node.body[0].value.ctx
@@ -28,7 +28,7 @@ class CoverageInjectorTest(unittest.TestCase):
             self.assertFalse(self.coverage_injector.is_covered(node))
 
     def test_covered_node(self):
-        node = utils.create_ast('x = 1\nif False:\n\ty = 2')
+        node = utils.create_ast("x = 1\nif False:\n\ty = 2")
 
         self.coverage_injector.inject(node)
 
@@ -37,7 +37,7 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_covered([assign_node, constant_node])
 
     def test_not_covered_node(self):
-        node = utils.create_ast('if False:\n\ty = 2')
+        node = utils.create_ast("if False:\n\ty = 2")
 
         self.coverage_injector.inject(node)
 
@@ -46,14 +46,14 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_not_covered([assign_node, constant_node])
 
     def test_result(self):
-        node = utils.create_ast('x = 1')
+        node = utils.create_ast("x = 1")
 
         self.coverage_injector.inject(node)
 
         self.assertEqual(self.coverage_injector.get_result(), (5, 5))
 
     def test_future_statement_coverage(self):
-        node = utils.create_ast('from __future__ import print_function')
+        node = utils.create_ast("from __future__ import print_function")
 
         self.coverage_injector.inject(node)
 
@@ -69,14 +69,16 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_covered([docstring_node])
 
     def test_if_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         if False:
             pass
         elif True:
             pass
         else:
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -88,16 +90,20 @@ class CoverageInjectorTest(unittest.TestCase):
         second_if_body_el = second_if_node.body[0]
         else_body_el = second_if_node.orelse[0]
 
-        self.assert_covered([first_if_test_node, second_if_test_node, second_if_body_el])
+        self.assert_covered(
+            [first_if_test_node, second_if_test_node, second_if_body_el]
+        )
         self.assert_not_covered([first_if_body_el, else_body_el])
 
     def test_while__coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         while False:
             pass
         else:
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -110,10 +116,12 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_not_covered([while_body_el])
 
     def test_func_def_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         def foo(x):
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -125,12 +133,14 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_not_covered([func_body_el])
 
     def test_class_def_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         class X(object):
 
             def foo(x):
                 pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -141,12 +151,14 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_not_covered([func_body_el])
 
     def test_try_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         try:
             pass
         except:
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -158,12 +170,14 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_not_covered([except_node, except_body_el])
 
     def test_except_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         try:
             raise KeyError
         except KeyError:
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -174,12 +188,14 @@ class CoverageInjectorTest(unittest.TestCase):
         self.assert_covered([try_node, try_body_el, except_node, except_body_el])
 
     def test_for_coverage(self):
-        node = utils.create_ast(utils.f("""
+        node = utils.create_ast(
+            utils.f("""
         for x in []:
             pass
         else:
             pass
-        """))
+        """)
+        )
 
         self.coverage_injector.inject(node)
 
@@ -207,9 +223,9 @@ class UnittestCoverageResultTest(unittest.TestCase):
 
         result = UnittestCoverageResult(coverage_injector=coverage_injector)
         suite = unittest.TestSuite()
-        test_x = ATest(methodName='test_x')
+        test_x = ATest(methodName="test_x")
         suite.addTest(test_x)
-        test_y = ATest(methodName='test_y')
+        test_y = ATest(methodName="test_y")
         suite.addTest(test_y)
 
         suite.run(result)

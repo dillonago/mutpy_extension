@@ -3,11 +3,10 @@ import copy
 
 from mutpy import utils
 
-COVERAGE_SET_NAME = '__covered_nodes__'
+COVERAGE_SET_NAME = "__covered_nodes__"
 
 
 class MarkerNodeTransformer(ast.NodeTransformer):
-
     def __init__(self):
         super().__init__()
         self.last_marker = 0
@@ -19,7 +18,6 @@ class MarkerNodeTransformer(ast.NodeTransformer):
 
 
 class AbstractCoverageNodeTransformer(ast.NodeTransformer):
-
     @classmethod
     def get_coverable_nodes(cls):
         raise NotImplementedError()
@@ -27,7 +25,7 @@ class AbstractCoverageNodeTransformer(ast.NodeTransformer):
     def __init__(self):
         super().__init__()
         for node_class in self.get_coverable_nodes():
-            visit_method_name = 'visit_' + node_class.__name__
+            visit_method_name = "visit_" + node_class.__name__
             if not hasattr(self, visit_method_name):
                 if node_class == ast.ExceptHandler:
                     setattr(self, visit_method_name, self.inject_inside_visit)
@@ -48,20 +46,22 @@ class AbstractCoverageNodeTransformer(ast.NodeTransformer):
         return node
 
     def generate_coverage_node(self, node):
-        if hasattr(node, 'body'):
+        if hasattr(node, "body"):
             markers = self.get_markers_from_body_node(node)
         else:
             markers = self.get_included_markers(node)
-        coverage_node = utils.create_ast('{}.update({})'.format(COVERAGE_SET_NAME, repr(markers))).body[0]
+        coverage_node = utils.create_ast(
+            "{}.update({})".format(COVERAGE_SET_NAME, repr(markers))
+        ).body[0]
         coverage_node.lineno = node.lineno
         coverage_node.col_offset = node.col_offset
         return coverage_node
 
     def is_future_statement(self, node):
-        return isinstance(node, ast.ImportFrom) and node.module == '__future__'
+        return isinstance(node, ast.ImportFrom) and node.module == "__future__"
 
     def get_included_markers(self, node, without=None):
-        markers = {n.marker for n in ast.walk(node) if hasattr(n, 'marker')}
+        markers = {n.marker for n in ast.walk(node) if hasattr(n, "marker")}
         if without:
             for n in without:
                 markers.difference_update(self.get_included_markers(n))
@@ -71,7 +71,11 @@ class AbstractCoverageNodeTransformer(ast.NodeTransformer):
         if isinstance(node, (ast.If, ast.While)):
             return {node.marker} | self.get_included_markers(node.test)
         elif isinstance(node, ast.For):
-            return {node.marker} | self.get_included_markers(node.target) | self.get_included_markers(node.iter)
+            return (
+                {node.marker}
+                | self.get_included_markers(node.target)
+                | self.get_included_markers(node.iter)
+            )
         elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
             return self.get_included_markers(node, without=node.body)
         else:
@@ -139,18 +143,19 @@ class CoverageNodeTransformerPython33(AbstractCoverageNodeTransformer):
         }
 
 
-CoverageNodeTransformer = utils.get_by_python_version([
-    CoverageNodeTransformerPython32,
-    CoverageNodeTransformerPython33,
-])
+CoverageNodeTransformer = utils.get_by_python_version(
+    [
+        CoverageNodeTransformerPython32,
+        CoverageNodeTransformerPython33,
+    ]
+)
 
 
 class CoverageInjector:
-
     def __init__(self):
         self.covered_nodes = set()
 
-    def inject(self, node, module_name='coverage'):
+    def inject(self, node, module_name="coverage"):
         self.covered_nodes.clear()
         self.marker_transformer = MarkerNodeTransformer()
         marker_node = self.marker_transformer.visit(node)

@@ -6,7 +6,7 @@ from io import StringIO
 from mutpy import utils
 from mutpy.views import QuietTextView, TextView
 
-COLOR_RED = 'red'
+COLOR_RED = "red"
 
 
 @contextmanager
@@ -28,8 +28,8 @@ class QuietTextViewTest(unittest.TestCase):
     def test_decorate_with_color(self):
         # given
         text_view = self.get_quiet_text_view(colored_output=True)
-        text = 'mutpy'
-        expected_colored_text = '\x1b[31mmutpy\x1b[0m'
+        text = "mutpy"
+        expected_colored_text = "\x1b[31mmutpy\x1b[0m"
         # when
         colored_text = text_view.decorate(text, color=COLOR_RED)
         # then
@@ -37,7 +37,7 @@ class QuietTextViewTest(unittest.TestCase):
 
 
 class TextViewTest(unittest.TestCase):
-    SEPARATOR = '--------------------------------------------------------------------------------'
+    SEPARATOR = "--------------------------------------------------------------------------------"
     EOL = "\n"
 
     @staticmethod
@@ -47,14 +47,20 @@ class TextViewTest(unittest.TestCase):
     def test_print_code(self):
         # given
         text_view = self.get_text_view(show_mutants=True)
-        original = utils.create_ast('x = x + 1')
-        mutant = utils.create_ast('x = x - 1')
+        original = utils.create_ast("x = x + 1")
+        mutant = utils.create_ast("x = x - 1")
         # when
         with captured_output() as (out, err):
             text_view.print_code(mutant, original)
         # then
         output = out.getvalue().strip()
         self.assertEqual(
-            self.SEPARATOR + self.EOL + '- 1: x = x + 1' + self.EOL + '+ 1: x = x - 1' + self.EOL + self.SEPARATOR,
-            output
+            self.SEPARATOR
+            + self.EOL
+            + "- 1: x = x + 1"
+            + self.EOL
+            + "+ 1: x = x - 1"
+            + self.EOL
+            + self.SEPARATOR,
+            output,
         )

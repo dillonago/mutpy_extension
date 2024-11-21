@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def drop_column_inplace(df, column_name):
     """
     Drops a column from the DataFrame inplace.
@@ -12,6 +13,7 @@ def drop_column_inplace(df, column_name):
     None
     """
     df.drop(columns=[column_name], inplace=True)
+
 
 def drop_column_copy(df, column_name):
     """
@@ -30,12 +32,14 @@ def drop_column_copy(df, column_name):
 def fillna_inplace(df, value):
     return df.fillna(value, inplace=True)
 
+
 def fillna_copy(df, value):
     return df.fillna(value, inplace=False)
 
 
 def sort_values_inplace(df, by):
     return df.sort_values(by=by, inplace=True)
-    
+
+
 def sort_values_copy(df, by):
     return df.sort_values(by=by, inplace=False)

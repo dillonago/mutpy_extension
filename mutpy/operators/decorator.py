@@ -14,7 +14,7 @@ class DecoratorDeletion(MutationOperator):
 
     @classmethod
     def name(cls):
-        return 'DDL'
+        return "DDL"
 
 
 class AbstractMethodDecoratorInsertionMutationOperator(MutationOperator):
@@ -35,7 +35,9 @@ class AbstractMethodDecoratorInsertionMutationOperator(MutationOperator):
             lineno = node.decorator_list[-1].lineno
         else:
             lineno = node.lineno
-        decorator = ast.Name(id=self.get_decorator_name(), ctx=ast.Load(), lineno=lineno)
+        decorator = ast.Name(
+            id=self.get_decorator_name(), ctx=ast.Load(), lineno=lineno
+        )
         self.shift_lines(node.body, 1)
         node.decorator_list.append(decorator)
         return node
@@ -46,9 +48,9 @@ class AbstractMethodDecoratorInsertionMutationOperator(MutationOperator):
 
 class ClassmethodDecoratorInsertion(AbstractMethodDecoratorInsertionMutationOperator):
     def get_decorator_name(self):
-        return 'classmethod'
+        return "classmethod"
 
 
 class StaticmethodDecoratorInsertion(AbstractMethodDecoratorInsertionMutationOperator):
     def get_decorator_name(self):
-        return 'staticmethod'
+        return "staticmethod"

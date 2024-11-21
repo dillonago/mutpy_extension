@@ -28,14 +28,12 @@ class BaseTestSuite:
 
 
 class BaseTest:
-
     @abstractmethod
     def __repr__(self):
         pass
 
 
 class CoverageTestResult:
-
     def __init__(self, *args, coverage_injector=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.coverage_injector = coverage_injector
@@ -47,19 +45,22 @@ class CoverageTestResult:
         self.coverage_injector.covered_nodes.clear()
 
     def stop_measure_coverage(self, test):
-        self.test_covered_nodes[repr(test)] = self.coverage_injector.covered_nodes.copy() | self.always_covered_nodes
+        self.test_covered_nodes[repr(test)] = (
+            self.coverage_injector.covered_nodes.copy() | self.always_covered_nodes
+        )
         self.coverage_injector.covered_nodes.update(self.covered_nodes)
 
 
 SerializableMutationTestResult = namedtuple(
-    'SerializableMutationTestResult', [
-        'is_incompetent',
-        'is_survived',
-        'killer',
-        'exception_traceback',
-        'exception',
-        'tests_run',
-    ]
+    "SerializableMutationTestResult",
+    [
+        "is_incompetent",
+        "is_survived",
+        "killer",
+        "exception_traceback",
+        "exception",
+        "tests_run",
+    ],
 )
 
 
@@ -154,7 +155,11 @@ class BaseTestRunner:
 
     def create_test_suite(self, mutant_module):
         if not issubclass(self.test_suite_cls, BaseTestSuite):
-            raise ValueError('{0} is not a subclass of {1}'.format(self.test_suite_cls, BaseTestSuite))
+            raise ValueError(
+                "{0} is not a subclass of {1}".format(
+                    self.test_suite_cls, BaseTestSuite
+                )
+            )
         suite = self.create_empty_test_suite()
         injector = utils.ModuleInjector(mutant_module)
         for test_module, target_test in self.test_loader.load():
@@ -165,7 +170,9 @@ class BaseTestRunner:
         return suite
 
     @utils.TimeRegister
-    def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
+    def run_tests_with_mutant(
+        self, total_duration, mutant_module, mutations, coverage_result
+    ):
         suite = self.create_test_suite(mutant_module)
         if coverage_result:
             self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
@@ -191,7 +198,9 @@ class BaseTestRunner:
         coverage_module = coverage_injector.inject(target_ast, target_module.__name__)
         suite = self.create_test_suite(coverage_module)
         with self.stdout_manager:
-            coverage_result = suite.run_with_coverage(coverage_injector=coverage_injector)
+            coverage_result = suite.run_with_coverage(
+                coverage_injector=coverage_injector
+            )
         return coverage_injector, coverage_result
 
     def run_test(self, test_module, target_test):
@@ -219,6 +228,10 @@ class BaseTestRunner:
 
         for test in suite:
             test_id = repr(test)
-            if test_id in coverage_result.test_covered_nodes and mutated_nodes.isdisjoint(
-                    coverage_result.test_covered_nodes[test_id]):
+            if (
+                test_id in coverage_result.test_covered_nodes
+                and mutated_nodes.isdisjoint(
+                    coverage_result.test_covered_nodes[test_id]
+                )
+            ):
                 suite.skip_test(test)

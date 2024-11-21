@@ -1,6 +1,10 @@
 import ast
 
-from mutpy.operators.base import MutationResign, MutationOperator, AbstractUnaryOperatorDeletion
+from mutpy.operators.base import (
+    MutationResign,
+    MutationOperator,
+    AbstractUnaryOperatorDeletion,
+)
 
 
 class ArithmeticOperatorDeletion(AbstractUnaryOperatorDeletion):

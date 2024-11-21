@@ -9,7 +9,7 @@ class MockModulesLoader:
         self.names = [name]
         self.source = source
         self.module = types.ModuleType(name)
-        self.module.__file__ = '<string>'
+        self.module.__file__ = "<string>"
         self.load()
 
     def load(self, *args, **kwargs):
@@ -30,7 +30,7 @@ class FileMockModulesLoader:
         self.module = types.ModuleType(name)
 
     def __enter__(self):
-        self.module_file = tempfile.NamedTemporaryFile(suffix='.py',delete=False)
+        self.module_file = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
         self.module_file_path = self.module_file.name
         self.module_file.write(self.source.encode())
         self.module_file.close()
