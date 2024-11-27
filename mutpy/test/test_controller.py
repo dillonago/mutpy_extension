@@ -326,3 +326,8 @@ class HighOrderMutatorTest(unittest.TestCase):
                 self.assertEqual(len(mutations), 1)
         self.assertEqual(number, 1)
         self.assertEqual(codegen.to_source(target_ast), "x = 'test'")
+        
+        
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
