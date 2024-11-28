@@ -19,6 +19,7 @@ standard_operators = {
     ArgumentValueChanger,
     FloatTypeChanger,
     ComplexTypeChanger,
+    ArgumentAxis,
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,
@@ -48,7 +49,7 @@ standard_operators = {
     zeros2zeros_like,
     zeros_like2zeros,
     ones2ones_like,
-    ones_like2ones
+    ones_like2ones,
 }
 
 experimental_operators = {
