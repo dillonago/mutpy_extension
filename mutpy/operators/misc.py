@@ -17,6 +17,24 @@ class ArgumentValueChanger(MutationOperator):
                 return node  # Return the modified node
         # No matching argument found, skip mutation
         raise MutationResign()
+    
+class ResetIndexChanger(MutationOperator):
+    @copy_node
+    def mutate_Call(self, node):
+        # Look for keyword arguments with the target name
+        if isinstance(node.func, ast.Attribute) and node.func.attr=="reset_index":
+            return node.func.value
+        raise MutationResign()
+    
+    @copy_node
+    def mutate_Return(self, node):
+        if isinstance(node.value, ast.Call):
+            if node.value.func.attr!="reset_index":
+                sum = ast.Call(func=node.value.func, args=[], keywords=[])
+                reset_index = ast.Attribute(value=sum, attr='reset_index', ctx=ast.Load())
+                return ast.Return(value=ast.Call(func=reset_index, args=[], keywords=[]))
+        raise MutationResign()
+
 
 
 class ArgumentKeepDims(MutationOperator):
