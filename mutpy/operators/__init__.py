@@ -6,6 +6,7 @@ from .inheritance import *
 from .logical import *
 from .loop import *
 from .misc import *
+from .numpy import *
 
 SuperCallingInsert = utils.get_by_python_version([
     SuperCallingInsertPython27,
@@ -34,6 +35,7 @@ standard_operators = {
     SliceIndexRemove,
     SuperCallingDeletion,
     SuperCallingInsert,
+    AnyMutator
 }
 
 experimental_operators = {
