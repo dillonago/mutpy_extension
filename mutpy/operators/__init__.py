@@ -35,7 +35,15 @@ standard_operators = {
     SliceIndexRemove,
     SuperCallingDeletion,
     SuperCallingInsert,
-    AnyMutator
+    any2all,
+    all2any,
+    zeros2ones,
+    ones2zeros,
+    average2mean,
+    zeros2zeros_like,
+    zeros_like2zeros,
+    ones2ones_like,
+    ones_like2ones
 }
 
 experimental_operators = {
