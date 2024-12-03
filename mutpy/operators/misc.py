@@ -5,13 +5,28 @@ from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
 from mutpy.operators.base import MutationOperator, MutationResign
 
 
+
+
+class ArgumentValueChanger(MutationOperator):
+    def mutate_Call(self, node):
+        # Look for keyword arguments with the target name
+        for keyword in node.keywords:
+            if keyword.arg == "inplace":
+                # Replace the value with the new value
+                v = not keyword.value
+                keyword.value = ast.Constant(value=v)
+                return node  # Return the modified node
+        # No matching argument found, skip mutation
+        raise MutationResign()
+
+
 class AssignmentOperatorReplacement(AbstractArithmeticOperatorReplacement):
     def should_mutate(self, node):
         return isinstance(node.parent, ast.AugAssign)
 
     @classmethod
     def name(cls):
-        return 'ASR'
+        return "ASR"
 
 
 class BreakContinueReplacement(MutationOperator):
@@ -23,8 +38,8 @@ class BreakContinueReplacement(MutationOperator):
 
 
 class ConstantReplacement(MutationOperator):
-    FIRST_CONST_STRING = 'mutpy'
-    SECOND_CONST_STRING = 'python'
+    FIRST_CONST_STRING = "mutpy"
+    SECOND_CONST_STRING = "python"
 
     def mutate_Constant(self, node):
         if isinstance(node.value, (int, float)):  # Handle numbers
@@ -49,10 +64,56 @@ class ConstantReplacement(MutationOperator):
             return ast.Constant(value='')  # Replace non-empty strings with empty strings
 
         raise MutationResign()  # Skip for non-string nodes or docstrings
+        return ast.Str(s="")
 
     @classmethod
     def name(cls):
-        return 'CRP'
+        return "CRP"
+
+
+class DefaultParameterMutation(MutationOperator):
+    """Mutate default parameter values based on parameter type."""
+
+    def mutate_arguments_defaults(self, node):
+        """Remove the default arguments from a function."""
+        if isinstance(node, ast.arguments) and len(node.defaults) != 0:
+            node.defaults = []
+            return node
+        raise MutationResign()
+
+    def mutate_arguments_default_to_and_from_None(self, node):
+        """
+        Mutate default arguments to and from `None`.
+
+        For all default arguments that are `None`, mutate default argument value to a
+        string with a low collision chance. If a default argument is not `None`, change
+        it to `None`.
+        """
+        if isinstance(node, ast.arguments) and len(node.defaults) != 0:
+            for i, default_value in enumerate(node.defaults):
+                if default_value is None:
+                    # Randomly generated 16 character string to avoid collisions.
+                    node.defaults[i].value = "GxMEuCGdW4Lm75gr"
+                else:
+                    node.defaults[i].value = None
+            return node
+        raise MutationResign()
+
+    def mutate_arguments_default_from_None(self, node):
+        """Mutate a `None` default argument to not `None`."""
+        if (
+            isinstance(node.parent, ast.arguments)
+            and isinstance(node, ast.Constant)
+            and node.value is None
+        ):
+            # Randomly generated 16 character string to avoid collisions.
+            node.value = "GxMEuCGdW4Lm75gr"
+            return node
+        raise MutationResign()
+
+    @classmethod
+    def name(cls):
+        return "DPM"
 
 class SliceIndexRemove(MutationOperator):
     def mutate_Slice_remove_lower(self, node):
@@ -77,7 +138,7 @@ class SliceIndexRemove(MutationOperator):
 class SelfVariableDeletion(MutationOperator):
     def mutate_Attribute(self, node):
         try:
-            if node.value.id == 'self':
+            if node.value.id == "self":
                 return ast.Name(id=node.attr, ctx=ast.Load())
             else:
                 raise MutationResign()
@@ -99,4 +160,4 @@ class StatementDeletion(MutationOperator):
 
     @classmethod
     def name(cls):
-        return 'SDL'
+        return "SDL"
