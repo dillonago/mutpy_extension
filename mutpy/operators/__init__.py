@@ -21,6 +21,7 @@ standard_operators = {
     ComplexTypeChanger,
     ArgumentAxis,
     ArgumentKeepDims,
+    ResetIndexChanger,
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,
