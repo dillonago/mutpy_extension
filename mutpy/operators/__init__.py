@@ -20,6 +20,7 @@ standard_operators = {
     FloatTypeChanger,
     ComplexTypeChanger,
     ArgumentAxis,
+    ArgumentKeepDims,
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,

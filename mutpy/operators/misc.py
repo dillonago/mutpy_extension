@@ -1,12 +1,12 @@
 import ast
 
 from mutpy import utils
-from mutpy.operators import copy_node
 from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
 from mutpy.operators.base import MutationOperator, MutationResign, copy_node
 
 
 class ArgumentValueChanger(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         # Look for keyword arguments with the target name
         for keyword in node.keywords:
@@ -17,7 +17,22 @@ class ArgumentValueChanger(MutationOperator):
                 return node  # Return the modified node
         # No matching argument found, skip mutation
         raise MutationResign()
-    
+
+
+class ArgumentKeepDims(MutationOperator):
+    @copy_node
+    def mutate_Call(self, node):
+        # Look for keyword arguments with the target name
+        for keyword in node.keywords:
+            if keyword.arg == "keepdims":
+                # Replace the value with the new value
+                v = not keyword.value.value
+                keyword.value = ast.Constant(value=v)
+                return node  # Return the modified node
+        # No matching argument found, skip mutation
+        raise MutationResign()
+
+
 class ArgumentAxis(MutationOperator):
     @copy_node
     def mutate_Call(self, node):
@@ -25,7 +40,7 @@ class ArgumentAxis(MutationOperator):
         for keyword in node.keywords:
             if keyword.arg == "axis":
                 # Replace the value with the new value
-                v = keyword.value.value^1
+                v = keyword.value.value ^ 1
                 keyword.value = ast.Constant(value=v)
                 return node  # Return the modified node
         # No matching argument found, skip mutation
@@ -155,7 +170,9 @@ class ConstantReplacement(MutationOperator):
 
     def mutate_Constant_empty(self, node):
         if isinstance(node.value, str) and node.value and not utils.is_docstring(node):
-            return ast.Constant(value='')  # Replace non-empty strings with empty strings
+            return ast.Constant(
+                value=""
+            )  # Replace non-empty strings with empty strings
 
         raise MutationResign()  # Skip for non-string nodes or docstrings
         return ast.Str(s="")
@@ -208,6 +225,7 @@ class DefaultParameterMutation(MutationOperator):
     @classmethod
     def name(cls):
         return "DPM"
+
 
 class SliceIndexRemove(MutationOperator):
     def mutate_Slice_remove_lower(self, node):
