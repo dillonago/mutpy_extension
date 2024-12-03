@@ -119,12 +119,15 @@ class MutationTestResult:
         self.type_error = err
 
     def add_passed(self, name):
+        print("passed")
         self.passed.append(TestInfo(name))
 
     def add_skipped(self, name):
+        print("skipped")
         self.skipped.append(TestInfo(name))
 
     def add_failed(self, name, short_message, long_message):
+        print("failed")
         self.failed.append(TestFailure(name, short_message, long_message))
 
 
@@ -164,6 +167,8 @@ class BaseTestRunner:
         injector = utils.ModuleInjector(mutant_module)
         for test_module, target_test in self.test_loader.load():
             injector.inject_to(test_module)
+            print(f"`test_runners.base.BaseTestRunner` test_module {test_module}")
+            print(f"`test_runners.base.BaseTestRunner` target_test {target_test}")
             suite.add_tests(test_module, target_test)
         importer = utils.InjectImporter(mutant_module)
         importer.install()
@@ -178,6 +183,7 @@ class BaseTestRunner:
             self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
         timer = utils.Timer()
         result = self.run_mutation_test_runner(suite, total_duration)
+        print(f"`BaseTestRunner.run_tests_with_mutants` result: {result}")
         timer.stop()
         return result, timer.duration
 
@@ -187,7 +193,11 @@ class BaseTestRunner:
         test_runner = test_runner_class(suite=suite)
         with self.stdout_manager:
             test_runner.start()
+            print(
+                f"`BaseTestRunner.test_runners.base` start, test_runner: {test_runner}"
+            )
             result = test_runner.get_result(live_time)
+            print(f"`BaseTestRunner.test_runners.base` result: {result}")
             test_runner.terminate()
         return result
 

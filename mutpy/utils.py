@@ -337,6 +337,7 @@ class MutationTestRunner:
 
     def run(self):
         result = self.suite.run()
+        print(f"`utils.MutationTestRunner` MutationTestResult: {result}")
         self.set_result(result)
 
 
@@ -347,8 +348,12 @@ class MutationTestRunnerProcess(MutationTestRunner, Process):
 
     def get_result(self, live_time):
         try:
-            return self.queue.get(timeout=live_time)
+            # self.queue.get(timeout=live_time)
+            result = self.queue.get()
+            print(f"`utils.MutationTestRunnerProcess` result: {result}")
+            return result
         except Empty:
+            print("`utils.MutationTestRunnerProcess.get_result` returning empty")
             return None
 
     def set_result(self, result):

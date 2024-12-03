@@ -100,7 +100,10 @@ class UnittestTestSuite(BaseTestSuite):
 
     def run(self):
         result = UnittestMutationTestResult()
+        print(f"`unittest_runner.UnittestTestSuite` Before | result: {result}")
         self.suite.run(result)
+        print(f"`unittest_runner.UnittestTestSuite` After | result: {result}")
+        print(f"`unittest_runner.UnittestTestSuite` run: {result.mutation_test_result}")
         return result.mutation_test_result
 
     def run_with_coverage(self, coverage_injector=None):

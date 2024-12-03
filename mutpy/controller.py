@@ -169,13 +169,22 @@ class MutationController(views.ViewNotifier):
     def run_tests_with_mutant(
         self, total_duration, mutant_module, mutations, coverage_result
     ):
+        print(
+            f"`controller.MutationController`.runner.run_test_with_mutant: {self.runner}"
+        )
         result, duration = self.runner.run_tests_with_mutant(
             total_duration, mutant_module, mutations, coverage_result
         )
+        print(f"run_test_with_mutant result: {result}")
+        print(f"run_test_with_mutant duration: {duration}")
         self.update_score_and_notify_views(result, duration)
 
     def update_score_and_notify_views(self, result, mutant_duration):
+        print("in update_score_and_notify_view")
         if not result:
+            print(
+                "update_score_and_notify_views timeout because no result timeout because no result"
+            )
             self.update_timeout_mutant(mutant_duration)
         elif result.is_incompetent:
             self.update_incompetent_mutant(result, mutant_duration)
