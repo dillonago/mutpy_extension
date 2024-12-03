@@ -61,7 +61,12 @@ class PandasMutator(MutationOperator):
                 return node  # Return the modified node
         # No matching argument found, skip mutation
         raise MutationResign()
+    
+    @classmethod
+    def name(cls):
+        return "PDM"
 
+class TypeChanger(MutationOperator):
     # 1280
     @copy_node
     def mutate_Call_float64attr(self, node):
@@ -142,7 +147,7 @@ class PandasMutator(MutationOperator):
 
     @classmethod
     def name(cls):
-        return "PDM"
+        return "TC"
 
 
 class NumpyMutator(MutationOperator):
