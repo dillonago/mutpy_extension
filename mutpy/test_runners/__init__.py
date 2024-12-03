@@ -2,9 +2,9 @@ from .unittest_runner import UnittestTestRunner
 
 
 def pytest_installed():
-    import importlib.util
+    import importlib
+    pytest_loader = importlib.util.find_spec('pytest')
 
-    pytest_loader = importlib.util.find_spec("pytest")
     return pytest_loader is not None
 
 
