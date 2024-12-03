@@ -8,10 +8,12 @@ from .loop import *
 from .misc import *
 from .numpy import *
 
-SuperCallingInsert = utils.get_by_python_version([
-    SuperCallingInsertPython27,
-    SuperCallingInsertPython35,
-])
+SuperCallingInsert = utils.get_by_python_version(
+    [
+        SuperCallingInsertPython27,
+        SuperCallingInsertPython35,
+    ]
+)
 
 standard_operators = {
     ArgumentValueChanger,
@@ -23,6 +25,7 @@ standard_operators = {
     ConditionalOperatorInsertion,
     ConstantReplacement,
     DecoratorDeletion,
+    DefaultParameterMutation,
     ExceptionHandlerDeletion,
     ExceptionSwallowing,
     HidingVariableDeletion,
