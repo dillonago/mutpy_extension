@@ -147,7 +147,7 @@ class TypeChanger(MutationOperator):
 
     @classmethod
     def name(cls):
-        return "TC"
+        return "TCH"
 
 
 class NumpyMutator(MutationOperator):

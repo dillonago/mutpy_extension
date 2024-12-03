@@ -20,6 +20,7 @@ standard_operators = {
     AssignmentOperatorReplacement,
     PandasMutator,
     NumpyMutator,
+    TypeChanger,
     BreakContinueReplacement,
     ConditionalOperatorDeletion,
     ConditionalOperatorInsertion,
