@@ -137,6 +137,41 @@ class CoverageNodeTransformerPython33(AbstractCoverageNodeTransformer):
             ast.For,
             ast.While,
         }
+        
+class CoverageNodeTransformerPython38(AbstractCoverageNodeTransformer):
+    __python_version__ = (3, 8)
+
+    @classmethod
+    def get_coverable_nodes(cls):
+        return {
+            ast.Assert,
+            ast.Assign,
+            ast.AnnAssign,  # New in 3.8
+            ast.AugAssign,
+            ast.Break,
+            ast.Continue,
+            ast.Delete,
+            ast.Expr,
+            ast.Global,
+            ast.Import,
+            ast.ImportFrom,
+            ast.Nonlocal,
+            ast.Pass,
+            ast.Raise,
+            ast.Return,
+            ast.FunctionDef,
+            ast.AsyncFunctionDef,  # For async functions
+            ast.ClassDef,
+            ast.ExceptHandler,
+            ast.If,
+            ast.For,
+            ast.While,
+            ast.With,
+            ast.AsyncWith,  # For async with statements
+            ast.Try,
+            # ast.arg,  # If mutating default values or annotations
+            ast.AsyncFor,  # For async for loops
+        }
 
 
 CoverageNodeTransformer = utils.get_by_python_version([

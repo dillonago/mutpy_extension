@@ -50,17 +50,36 @@ class CoverageTestResult:
         self.test_covered_nodes[repr(test)] = self.coverage_injector.covered_nodes.copy() | self.always_covered_nodes
         self.coverage_injector.covered_nodes.update(self.covered_nodes)
 
+class SerializableMutationTestResult:
+    def __init__(self, is_incompetent, is_survived, killer, exception_traceback, exception, tests_run):
+        self.is_incompetent = is_incompetent
+        self.is_survived = is_survived
+        self.killer = killer
+        self.exception_traceback = exception_traceback
+        self.exception = exception
+        self.tests_run = tests_run
 
-SerializableMutationTestResult = namedtuple(
-    'SerializableMutationTestResult', [
-        'is_incompetent',
-        'is_survived',
-        'killer',
-        'exception_traceback',
-        'exception',
-        'tests_run',
-    ]
-)
+    def serialize(self):
+        return {
+            'is_incompetent': self.is_incompetent,
+            'is_survived': self.is_survived,
+            'killer': self.killer,
+            'exception_traceback': self.exception_traceback,
+            'exception': self.exception,
+            'tests_run': self.tests_run,
+        }
+
+
+# SerializableMutationTestResult = namedtuple(
+#     'SerializableMutationTestResult', [
+#         'is_incompetent',
+#         'is_survived',
+#         'killer',
+#         'exception_traceback',
+#         'exception',
+#         'tests_run',
+#     ]
+# )
 
 
 class MutationTestResult:

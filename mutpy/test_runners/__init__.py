@@ -1,4 +1,5 @@
 from .unittest_runner import UnittestTestRunner
+from importlib.util import find_spec
 
 
 def pytest_installed():

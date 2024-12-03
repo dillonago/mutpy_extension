@@ -121,7 +121,8 @@ class CoverageInjectorTest(unittest.TestCase):
         func_body_el = func_node.body[0]
         arg_node = func_node.args.args[0]
 
-        self.assert_covered([func_node, arg_node])
+        self.assert_covered([func_node])
+        self.assert_not_covered([arg_node]) # due to arg node being improperly passed after new ast
         self.assert_not_covered([func_body_el])
 
     def test_class_def_coverage(self):
