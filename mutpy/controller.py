@@ -107,6 +107,8 @@ class MutationController(views.ViewNotifier):
     @utils.TimeRegister
     def mutate_module(self, target_module, to_mutate, total_duration):
         target_ast = self.create_target_ast(target_module)
+        # import pprint, ast
+        # pprint.pprint(ast.dump(target_ast))
         coverage_injector, coverage_result = self.inject_coverage(target_ast, target_module)
         if coverage_injector:
             self.score.update_coverage(*coverage_injector.get_result())

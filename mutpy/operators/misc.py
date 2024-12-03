@@ -1,10 +1,9 @@
 import ast
 
 from mutpy import utils
+from mutpy.operators import copy_node
 from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
 from mutpy.operators.base import MutationOperator, MutationResign
-
-
 
 
 class ArgumentValueChanger(MutationOperator):
@@ -17,6 +16,88 @@ class ArgumentValueChanger(MutationOperator):
                 keyword.value = ast.Constant(value=v)
                 return node  # Return the modified node
         # No matching argument found, skip mutation
+        raise MutationResign()
+
+
+class FloatTypeChanger(MutationOperator):
+    # 1280
+    @copy_node
+    def mutate_Call_float64attr(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "float64":
+            node.func.attr = "float32"
+            return node
+        raise MutationResign()
+
+    # 403, 405, 1934
+    @copy_node
+    def mutate_Assign_float(self, node):
+        if isinstance(node.value, ast.IfExp):
+            if isinstance(node.value.orelse, ast.Attribute):
+                if node.value.orelse.attr == "float64":
+                    node.value.orelse.attr = "float32"
+                    return node
+                elif node.value.orelse.attr == "float32":
+                    node.value.orelse.attr = "float64"
+                    return node
+        raise MutationResign()
+
+    # 400, 1053
+    @copy_node
+    def mutate_Call_float64arg(self, node):
+        if len(node.args) > 0:
+            if (
+                isinstance(node.args[0], ast.Attribute)
+                and node.args[0].attr == "float64"
+            ):
+                node.args[0].attr = "float32"
+                return node
+        raise MutationResign()
+
+    # 1248
+    @copy_node
+    def mutate_If_float64(self, node):
+        if len(node.body) > 0:
+            if isinstance(node.body[0], ast.Assign):
+                if isinstance(node.body[0].value, ast.IfExp):
+                    if isinstance(node.body[0].value.body, ast.Attribute):
+                        if node.body[0].value.body.attr == "float64":
+                            node.body[0].value.body.attr = "float32"
+                            return node
+        raise MutationResign()
+
+
+class ComplexTypeChanger(MutationOperator):
+    # 403, 405, 1934
+    @copy_node
+    def mutate_Assign_complex64(self, node):
+        if isinstance(node.value, ast.IfExp):
+            if isinstance(node.value.body, ast.Attribute):
+                if node.value.body.attr == "complex64":
+                    node.value.body.attr = "complex128"
+                    return node
+                elif node.value.body.attr == "complex128":
+                    node.value.body.attr = "complex64"
+                    return node
+        raise MutationResign()
+
+    # 1248
+    @copy_node
+    def mutate_If_complex128(self, node):
+        if len(node.body) > 0:
+            if isinstance(node.body[0], ast.Assign):
+                if isinstance(node.body[0].value, ast.IfExp):
+                    if isinstance(node.body[0].value.orelse, ast.Attribute):
+                        if node.body[0].value.orelse.attr == "complex128":
+                            node.body[0].value.orelse.attr = "complex64"
+                            return node
+        raise MutationResign()
+
+    # 1280
+    @copy_node
+    def mutate_Call_complex128attr(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "complex128":
+            node.func.attr = "complex64"
+            return node
         raise MutationResign()
 
 
