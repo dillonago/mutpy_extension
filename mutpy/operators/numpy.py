@@ -2,10 +2,11 @@ import ast
 
 from mutpy import utils
 from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
-from mutpy.operators.base import MutationOperator, MutationResign
+from mutpy.operators.base import MutationOperator, MutationResign, copy_node
 
 
 class any2all(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "any":
             name = node.func.value
@@ -15,6 +16,7 @@ class any2all(MutationOperator):
         raise MutationResign()
 
 class all2any(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "all":
             name = node.func.value
@@ -24,6 +26,7 @@ class all2any(MutationOperator):
         raise MutationResign()
 
 class zeros2ones(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
             name = node.func.value
@@ -33,6 +36,7 @@ class zeros2ones(MutationOperator):
         raise MutationResign()
 
 class ones2zeros(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
             name = node.func.value
@@ -42,6 +46,7 @@ class ones2zeros(MutationOperator):
         raise MutationResign()
 
 class average2mean(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "average":
             name = node.func.value
@@ -51,6 +56,7 @@ class average2mean(MutationOperator):
         raise MutationResign()
 
 class zeros2zeros_like(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
             name = node.func.value
@@ -60,6 +66,7 @@ class zeros2zeros_like(MutationOperator):
         raise MutationResign()
 
 class zeros_like2zeros(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros_like":
             name = node.func.value
@@ -70,6 +77,7 @@ class zeros_like2zeros(MutationOperator):
 
 
 class ones2ones_like(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
             name = node.func.value
@@ -79,6 +87,7 @@ class ones2ones_like(MutationOperator):
         raise MutationResign()
 
 class ones_like2ones(MutationOperator):
+    @copy_node
     def mutate_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == "ones_like":
             name = node.func.value
