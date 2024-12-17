@@ -1,4 +1,43 @@
-MutPy
+CS230 MutPy Instructions
+=====
+
+We will be going over how to setup, run, and test MutPy.
+
+First clone this repository and install MutPy.
+
+```$ git clone https://github.com/njhuey/mutpy.git```
+```$ cd mutpy/```
+```$ pip3 install .```
+
+To run MutPy, we need a target file and a test file. The target file, which will come after the `--target` flag, contains the source code that will be mutated. The test file, which holds the test cases for the target file, will come after the `--unit-test` flags.
+
+Here is the command for running MutPy: 
+```$ mut.py --target target_file --unit-test test_file -m```
+
+With the `-m` flag, we are able to see all of the mutations created and ran on the test file, as well as the result on if the mutant was killed, survived, was incompetent, or timed out. 
+On the README file, many flags of features are listed to help customize parameters, some being the timeout factor, listing all the type of mutators, and choosing to run on certain mutators.\\
+Running without the `--operator` flag means it will run all mutations available, meaning all of the default MutPy mutators as well as the ones we extended. If the user would like to test a subset of mutators, for example the NumPy mutators we implemented, the user can run MutPy on a target file and test file using the `--operator` flag and choose the specific operator to run. Here is the command to run just the NumPy function mutations: 
+
+```$ mut.py --target target_file --unit-test test_file -m --operator NPM```
+
+If there are multiple operators the user would like to run, MutPy allows them to stack operators. Here is an example command below: 
+
+```$ mut.py --target target_file --unit-test test_file -m --operator NPM TCH```
+
+To replicate our process of running MutPy on SciPy, an open source library built on top of NumPy with a wide range of functions for the scientific computing domain, the user first must build SciPy from source. The instructions can be found \href{https://docs.scipy.org/doc/scipy/building/index.html#building-from-source}{here}, or at this link (https://docs.scipy.org/doc/scipy/building/index.html#building-from-source). 
+After following the instructions and the user is in the mamba/conda development environment, the user can run this command to verify the test cases in the test file are being ran correctly: 
+
+```$ pytest scipy/linalg/tests/test_basic.py```
+
+Once all the tests are passed, we can run MutPy on the source code and test file. In the environment, cd to the cloned MutPy directory and install the MutPy module. This is important to make sure the code changes and extensions added to MutPy are executed correctly. After this step is done, cd back into the cloned SciPy directory and the user is able to run MutPy on the files in the library. We focused on the \textunderscore basic.py file and the test\textunderscore basic.py test file in our evaluations, and here are some example commands to run MutPy on SciPy. 
+
+```$ mut.py --target scipy/linalg/_basic.py --unit-test scipy/linalg/tests/test_basic.py -m```
+
+```$ mut.py --target scipy/linalg/_basic.py --unit-test scipy/linalg/tests/test_basic.py -m --operator NPM```
+
+```$ mut.py --target scipy/linalg/_basic.py --unit-test scipy/linalg/tests/test_basic.py -m --operator TCH```
+
+Original MutPy Instructions
 =====
 
 |Python Versions| |Build Status| |Coverage Status| |Code Climate|
