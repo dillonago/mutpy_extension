@@ -15,6 +15,13 @@ SuperCallingInsert = utils.get_by_python_version(
 )
 
 standard_operators = {
+    NumPyFunction,
+    ArgumentValueChanger,
+    FloatTypeChanger,
+    ComplexTypeChanger,
+    ArgumentAxis,
+    ArgumentKeepDims,
+    ResetIndexChanger,
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,
