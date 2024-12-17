@@ -90,7 +90,7 @@ class NumPyFunction(MutationOperator):
 
 class ArgumentValueChanger(MutationOperator):
     @copy_node
-    def mutate_Call(self, node):
+    def mutate_Call_argument(self, node):
         # Look for keyword arguments with the target name
         for keyword in node.keywords:
             if keyword.arg == "inplace":
@@ -101,28 +101,31 @@ class ArgumentValueChanger(MutationOperator):
         # No matching argument found, skip mutation
         raise MutationResign()
 
-
 class ResetIndexChanger(MutationOperator):
     @copy_node
-    def mutate_Call(self, node):
+    def mutate_Call_reset_index(self, node):
         # Look for keyword arguments with the target name
         if isinstance(node.func, ast.Attribute) and node.func.attr == "reset_index":
             return node.func.value
         raise MutationResign()
 
     @copy_node
-    def mutate_Return(self, node):
+    def mutate_Return_reset_index(self, node):
         if isinstance(node.value, ast.Call):
             if node.value.func.attr != "reset_index":
                 sum = ast.Call(func=node.value.func, args=[], keywords=[])
-                reset_index = ast.Attribute(value=sum, attr='reset_index', ctx=ast.Load())
-                return ast.Return(value=ast.Call(func=reset_index, args=[], keywords=[]))
+                reset_index = ast.Attribute(
+                    value=sum, attr="reset_index", ctx=ast.Load()
+                )
+                return ast.Return(
+                    value=ast.Call(func=reset_index, args=[], keywords=[])
+                )
         raise MutationResign()
 
-
+        
 class ArgumentKeepDims(MutationOperator):
     @copy_node
-    def mutate_Call(self, node):
+    def mutate_Call_keep_dims(self, node):
         # Look for keyword arguments with the target name
         for keyword in node.keywords:
             if keyword.arg == "keepdims":
@@ -133,10 +136,8 @@ class ArgumentKeepDims(MutationOperator):
         # No matching argument found, skip mutation
         raise MutationResign()
 
-
-class ArgumentAxis(MutationOperator):
     @copy_node
-    def mutate_Call(self, node):
+    def mutate_Call_argument_axis(self, node):
         # Look for keyword arguments with the target name
         for keyword in node.keywords:
             if keyword.arg == "axis":
@@ -146,9 +147,12 @@ class ArgumentAxis(MutationOperator):
                 return node  # Return the modified node
         # No matching argument found, skip mutation
         raise MutationResign()
+    
+    @classmethod
+    def name(cls):
+        return "PDM"
 
-
-class FloatTypeChanger(MutationOperator):
+class TypeChanger(MutationOperator):
     # 1280
     @copy_node
     def mutate_Call_float64attr(self, node):
@@ -194,8 +198,6 @@ class FloatTypeChanger(MutationOperator):
                             return node
         raise MutationResign()
 
-
-class ComplexTypeChanger(MutationOperator):
     # 403, 405, 1934
     @copy_node
     def mutate_Assign_complex64(self, node):
@@ -228,6 +230,97 @@ class ComplexTypeChanger(MutationOperator):
             node.func.attr = "complex64"
             return node
         raise MutationResign()
+
+    @classmethod
+    def name(cls):
+        return "TCH"
+
+
+class NumpyMutator(MutationOperator):
+    @copy_node
+    def mutate_Call_any2all(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "any":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="all", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_all2any(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "all":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="any", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_zeros2ones(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="ones", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_ones2zeros(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="zeros", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_average2mean(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "average":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="mean", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_zeros2zeros_like(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="zeros_like", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_zeros_like2zeros(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros_like":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="zeros", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_ones2ones_like(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="ones_like", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_ones_like2ones(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones_like":
+            name = node.func.value
+            all_node = ast.Attribute(value=name, attr="ones", ctx=ast.Load())
+            node.func = all_node
+            return node
+        raise MutationResign()
+
+    @classmethod
+    def name(cls):
+        return "NPM"
 
 
 class AssignmentOperatorReplacement(AbstractArithmeticOperatorReplacement):

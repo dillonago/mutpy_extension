@@ -7,7 +7,6 @@ from .logical import *
 from .loop import *
 from .misc import *
 
-
 SuperCallingInsert = utils.get_by_python_version(
     [
         SuperCallingInsertPython27,
@@ -26,6 +25,9 @@ standard_operators = {
     ArithmeticOperatorDeletion,
     ArithmeticOperatorReplacement,
     AssignmentOperatorReplacement,
+    PandasMutator,
+    NumpyMutator,
+    TypeChanger,
     BreakContinueReplacement,
     ConditionalOperatorDeletion,
     ConditionalOperatorInsertion,
