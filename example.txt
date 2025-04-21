@@ -1,0 +1,30 @@
+Start mutation process:
+  -targets: calculator
+  -tests: calctest
+2 tests passed:
+  -calctest [0.00017 s]
+Start mutants generation and execution:
+[#   1] AOR calculator:[0.00490 s] killed by test_mul (calctest.CalculatorTest)
+Traceback (most recent call last):
+  File "/home/ec2-user/mutpy_extension/./calctest.py", line 7, in test_mul
+    self.assertEqual(mul(2, 0), 0)
+  File "calculator", line 2, in mul
+ZeroDivisionError: division by zero
+[#   2] AOR calculator:[0.00463 s] killed by test_mul (calctest.CalculatorTest)
+Traceback (most recent call last):
+  File "/home/ec2-user/mutpy_extension/./calctest.py", line 7, in test_mul
+    self.assertEqual(mul(2, 0), 0)
+  File "calculator", line 2, in mul
+ZeroDivisionError: integer division or modulo by zero
+[#   3] AOR calculator:[0.00783 s] killed by test_mul (calctest.CalculatorTest)
+Traceback (most recent call last):
+  File "/home/ec2-user/mutpy_extension/./calctest.py", line 7, in test_mul
+    self.assertEqual(mul(2, 0), 0)
+AssertionError: 1 != 0
+[#   4] AOR calculator:[0.00497 s] survived
+[#   5] AOR calculator:[0.00434 s] killed by test_div (calctest.CalculatorTest)
+Traceback (most recent call last):
+  File "/home/ec2-user/mutpy_extension/./calctest.py", line 10, in test_div
+    self.assertEqual(div(2, 2), 1)
+AssertionError: 4 != 1
+all: 5

@@ -4,6 +4,9 @@ from collections import namedtuple
 
 from mutpy import utils, coverage
 
+import ast
+import inspect
+
 
 class BaseTestSuite:
     @abstractmethod
@@ -124,6 +127,7 @@ class MutationTestResult:
         return len(self.skipped)
 
     def serialize(self):
+        # print(str(self.get_exception_traceback()))
         return SerializableMutationTestResult(
             self.is_incompetent(),
             self.is_survived(),
@@ -144,6 +148,9 @@ class MutationTestResult:
 
     def add_failed(self, name, short_message, long_message):
         self.failed.append(TestFailure(name, short_message, long_message))
+
+    def log_result(self): 
+        print("edit here")
 
 
 class TestInfo:
@@ -167,6 +174,7 @@ class BaseTestRunner:
         self.stdout_manager = stdout_manager
         self.mutate_covered = mutate_covered
         self.init_modules = self.find_init_modules()
+        self.new_test_loader = utils.ModulesLoader(['llmtestsuite'], None)
 
     def create_empty_test_suite(self):
         return self.test_suite_cls()
@@ -183,9 +191,22 @@ class BaseTestRunner:
         importer.install()
         return suite
 
+    def create_llm_test_suite(self, mutant_module, file_name):
+        if not issubclass(self.test_suite_cls, BaseTestSuite):
+            raise ValueError('{0} is not a subclass of {1}'.format(self.test_suite_cls, BaseTestSuite))
+        suite = self.create_empty_test_suite()
+        injector = utils.ModuleInjector(mutant_module)
+        for test_module, target_test in utils.ModulesLoader([file_name], None).load():
+            injector.inject_to(test_module)
+            suite.add_tests(test_module, target_test)
+        importer = utils.InjectImporter(mutant_module)
+        importer.install()
+        return suite
+
     @utils.TimeRegister
     def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
         suite = self.create_test_suite(mutant_module)
+        # print(suite.suite)
         if coverage_result:
             self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
         timer = utils.Timer()
@@ -197,6 +218,7 @@ class BaseTestRunner:
         live_time = self.timeout_factor * (total_duration if total_duration > 1 else 1)
         test_runner_class = utils.get_mutation_test_runner_class()
         test_runner = test_runner_class(suite=suite)
+        # print(suite.suite._tests)
         with self.stdout_manager:
             test_runner.start()
             result = test_runner.get_result(live_time)
@@ -214,6 +236,8 @@ class BaseTestRunner:
         return coverage_injector, coverage_result
 
     def run_test(self, test_module, target_test):
+        # print(type(test_module))
+        # print(inspect.getsource(test_module))
         suite = self.create_empty_test_suite()
         suite.add_tests(test_module, target_test)
         timer = utils.Timer()

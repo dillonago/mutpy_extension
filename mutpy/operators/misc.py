@@ -5,90 +5,7 @@ from mutpy.operators.arithmetic import AbstractArithmeticOperatorReplacement
 from mutpy.operators.base import MutationOperator, MutationResign, copy_node
 
 
-class NumPyFunction(MutationOperator):
-    @copy_node
-    def mutate_Call_any2all(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "any":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="all", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_all2any(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "all":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="any", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_zeros2ones(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="ones", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_ones2zeros(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="zeros", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_average2mean(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "average":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="mean", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_zeros2zeros_like(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="zeros_like", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_zeros_like2zeros(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "zeros_like":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="zeros", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_ones2ones_like(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="ones_like", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-    @copy_node
-    def mutate_Call_ones_like2ones(self, node):
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "ones_like":
-            name = node.func.value
-            all_node = ast.Attribute(value=name, attr="ones", ctx=ast.Load())
-            node.func = all_node
-            return node
-        raise MutationResign()
-
-
-class ArgumentValueChanger(MutationOperator):
+class PandasMutator(MutationOperator):
     @copy_node
     def mutate_Call_argument(self, node):
         # Look for keyword arguments with the target name
@@ -97,11 +14,11 @@ class ArgumentValueChanger(MutationOperator):
                 # Replace the value with the new value
                 v = not keyword.value
                 keyword.value = ast.Constant(value=v)
+                print(ast.dump(node))
                 return node  # Return the modified node
         # No matching argument found, skip mutation
         raise MutationResign()
 
-class ResetIndexChanger(MutationOperator):
     @copy_node
     def mutate_Call_reset_index(self, node):
         # Look for keyword arguments with the target name
@@ -109,21 +26,52 @@ class ResetIndexChanger(MutationOperator):
             return node.func.value
         raise MutationResign()
 
-    @copy_node
-    def mutate_Return_reset_index(self, node):
-        if isinstance(node.value, ast.Call):
-            if node.value.func.attr != "reset_index":
-                sum = ast.Call(func=node.value.func, args=[], keywords=[])
-                reset_index = ast.Attribute(
-                    value=sum, attr="reset_index", ctx=ast.Load()
-                )
-                return ast.Return(
-                    value=ast.Call(func=reset_index, args=[], keywords=[])
-                )
-        raise MutationResign()
+    # @copy_node
+    # def mutate_Return_reset_index(self, node):
+    #     if isinstance(node.value, ast.Call):
+    #         # print("Original ast.Call:", ast.dump(node.value, indent=4))
+    #         if node.value.func.attr != "reset_index":
+    #             if not node.value.keywords:
+    #                 sum = ast.Call(func=node.value.func, args=[], keywords=[])
+    #             else:
+    #                 sum = ast.Call(func=node.value.func, args=[], keywords=node.value.keywords)
+    #             reset_index = ast.Attribute(
+    #                 value=sum, attr="reset_index", ctx=ast.Load()
+    #             )
+    #             return ast.Return(
+    #                 value=ast.Call(func=reset_index, args=[], keywords=[])
+    #             )
+    #     raise MutationResign()
 
-        
-class ArgumentKeepDims(MutationOperator):
+    # @copy_node
+    # def mutate_Return_reset_index(self, node):
+    #     if isinstance(node.value, ast.Call):
+    #         if node.value.func.attr != "reset_index":
+    #             # Copy the arguments and keywords from the original call
+    #             args = node.value.args
+    #             keywords = [
+    #                 keyword for keyword in node.value.keywords
+    #                 if keyword.arg != "axis"
+    #             ]
+            
+    #             # Ensure "axis=0" is in the keywords
+    #             if not any(keyword.arg == "axis" for keyword in node.value.keywords):
+    #                 keywords.append(ast.keyword(arg="axis", value=ast.Constant(value=0)))
+
+    #             # Create the sum call
+    #             sum_call = ast.Call(func=node.value.func, args=args, keywords=keywords)
+                
+    #             # Create the reset_index attribute
+    #             reset_index = ast.Attribute(
+    #                 value=sum_call, attr="reset_index", ctx=ast.Load()
+    #             )
+            
+    #             # Return the new call
+    #             return ast.Return(
+    #                 value=ast.Call(func=reset_index, args=[], keywords=[])
+    #             )
+    # raise MutationResign()
+
     @copy_node
     def mutate_Call_keep_dims(self, node):
         # Look for keyword arguments with the target name
@@ -161,8 +109,25 @@ class TypeChanger(MutationOperator):
             return node
         raise MutationResign()
 
-    # 403, 405, 1934
     @copy_node
+    def mutate_Call_float32attr(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "float32":
+            node.func.attr = "float64"
+            return node
+        raise MutationResign()
+
+    @copy_node
+    def mutate_Call_comp64attr(self, node):
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "complex64":
+            node.func = ast.Name(id='str', ctx=ast.Load())
+            node.args = [ast.Constant(value=56.1223)]
+            node.keywords = []
+
+            return node
+        raise MutationResign()
+
+    # 403, 405, 1934
+    # @copy_node
     def mutate_Assign_float(self, node):
         if isinstance(node.value, ast.IfExp):
             if isinstance(node.value.orelse, ast.Attribute):
@@ -179,16 +144,17 @@ class TypeChanger(MutationOperator):
     def mutate_Call_float64arg(self, node):
         if len(node.args) > 0:
             if (
-                    isinstance(node.args[0], ast.Attribute)
-                    and node.args[0].attr == "float64"
+                isinstance(node.args[0], ast.Attribute)
+                and node.args[0].attr == "float64"
             ):
                 node.args[0].attr = "float32"
                 return node
         raise MutationResign()
 
     # 1248
-    @copy_node
+    @copy_node  
     def mutate_If_float64(self, node):
+        # print(ast.dump(node))
         if len(node.body) > 0:
             if isinstance(node.body[0], ast.Assign):
                 if isinstance(node.body[0].value, ast.IfExp):
@@ -407,9 +373,9 @@ class DefaultParameterMutation(MutationOperator):
     def mutate_arguments_default_from_None(self, node):
         """Mutate a `None` default argument to not `None`."""
         if (
-                isinstance(node.parent, ast.arguments)
-                and isinstance(node, ast.Constant)
-                and node.value is None
+            isinstance(node.parent, ast.arguments)
+            and isinstance(node, ast.Constant)
+            and node.value is None
         ):
             # Randomly generated 16 character string to avoid collisions.
             node.value = "GxMEuCGdW4Lm75gr"

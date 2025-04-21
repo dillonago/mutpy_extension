@@ -1,5 +1,6 @@
 import argparse
 import sys
+import groq
 
 from mutpy import __version__ as version
 from mutpy import controller, views, operators, utils

@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from example.num import check_sum_diff, check_sum_same, check_prod_diff, check_prod_same
+from num import check_sum_diff, check_sum_same, check_prod_diff, check_prod_same
 
 class checkNumpy(unittest.TestCase):
     def test_sum_same(self): 
@@ -16,7 +16,8 @@ class checkNumpy(unittest.TestCase):
     def test_prod_same(self): 
         arr = np.array([[2,4,6], [9,5,4]])
         result = check_prod_same(arr, axis=1)
-        self.assertEqual(result.ndim, 2)
+        print(result)
+        self.assertEqual(result.shape, (2, 1))
 
     def test_prod_diff(self): 
         arr = np.array([[2,4,6], [9,5,4]])

@@ -1,5 +1,5 @@
 import unittest
-from example.resetIndex import no_resetIndex, resetIndex
+from resetIndex import no_resetIndex, resetIndex
 import pandas as pd
 import numpy as np
 

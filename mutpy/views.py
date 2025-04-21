@@ -80,17 +80,23 @@ class TextView(QuietTextView):
     def __init__(self, colored_output=False, show_mutants=False):
         super().__init__(colored_output)
         self.show_mutants = show_mutants
+        self.f = open("dashboard.txt", "w")
 
     def initialize(self, targets, tests):
+        self.f.write('Start mutation process:\n')
+        self.f.write('  -targets: {}\n'.format(', '.join(targets)))
+        self.f.write('  -tests: {}\n'.format(', '.join(tests)))
         self.level_print('Start mutation process:')
         self.level_print('targets: {}'.format(', '.join(targets)), 2)
         self.level_print('tests: {}'.format(', '.join(tests)), 2)
 
     def start(self):
+        self.f.write('Adding to dashboard:\n')
         self.level_print('Start mutants generation and execution:')
 
     def end(self, score, duration):
         super().end(score, duration)
+        self.f.write('all: {}'.format(score.all_mutants))
         self.level_print('all: {}'.format(score.all_mutants), 2)
 
         if score.all_mutants:
@@ -125,6 +131,7 @@ class TextView(QuietTextView):
 
     def mutation(self, number, mutations, module, mutant):
         for mutation in mutations:
+            self.f.write('[#{:>4}] {:<3} {}:'.format(number, mutation.operator.name(), module.__name__))
             self.level_print(
                 '[#{:>4}] {:<3} {}: '.format(number, mutation.operator.name(), module.__name__),
                 ended=False,
@@ -159,16 +166,25 @@ class TextView(QuietTextView):
         return list(unified_diff(original_src.split('\n'), mutant_src.split('\n'), n=4, lineterm=''))
 
     def killed(self, time, killer, *args, **kwargs):
+        self.f.write(self.time_format(time) + ' ' + self.decorate('killed', 'green') + ' by ' + str(killer) + '\n')
+        self.f.write(args[0])
+        self.f.write('-'*100 + '\n')
         self.level_print(self.time_format(time) + ' ' + self.decorate('killed', 'green') + ' by ' + str(killer),
                          continuation=True)
 
     def survived(self, time, *args, **kwargs):
+        self.f.write(self.time_format(time) + ' ' + self.decorate('survived', 'red')  + '\n')
+        self.f.write('-'*100 + '\n')
         self.level_print(self.time_format(time) + ' ' + self.decorate('survived', 'red'), continuation=True)
 
     def timeout(self, time, *args, **kwargs):
+        self.f.write(self.time_format(time) + ' ' + self.decorate('timeout', 'yellow')  + '\n')
+        self.f.write('-'*100 + '\n')
         self.level_print(self.time_format(time) + ' ' + self.decorate('timeout', 'yellow'), continuation=True)
 
     def incompetent(self, time, *args, **kwargs):
+        self.f.write(self.time_format(time) + ' ' + self.decorate('incompetent', 'cyan')  + '\n')
+        self.f.write('-'*100 + '\n')
         self.level_print(self.time_format(time) + ' ' + self.decorate('incompetent', 'cyan'), continuation=True)
 
 

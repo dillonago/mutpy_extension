@@ -1,0 +1,7 @@
+def test_comMul2(self):
+    data = np.random.rand(2,3).astype(np.complex128)
+    df = pd.DataFrame(data)
+    num = np.complex64(np.random.rand())
+    df_mul = df*num
+    output = df_mul.equals(comMul(df, num))
+    self.assertTrue(output)   

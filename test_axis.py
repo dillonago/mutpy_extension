@@ -1,5 +1,5 @@
 import pandas as pd
-from example.axis import axis_0, axis_1
+from axis import axis_0, axis_1
 import unittest
 
 class TestAxis(unittest.TestCase):
