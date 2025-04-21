@@ -1,4 +1,4 @@
-CS230 MutPy Instructions
+MutPy Extension Instructions
 =====
 
 We will be going over how to setup, run, and test MutPy.
