@@ -3,6 +3,7 @@ import sys
 import time
 
 import groq
+import os
 import ast
 import pprint
 import inspect
@@ -109,6 +110,9 @@ class MutationController(views.ViewNotifier):
             test_modules, total_duration, number_of_tests = self.load_and_check_tests()
 
             self.notify_passed(test_modules, number_of_tests)
+            #Start Gradio here
+
+
             self.notify_start()
 
             self.score = MutationScore()
@@ -128,7 +132,7 @@ class MutationController(views.ViewNotifier):
         total_duration = 0
         passedInitially = True
         errorMessage = None
-        print(file_name)
+        # print(file_name)
         for test_module, target_test in utils.ModulesLoader([file_name], None).load():
             # print(test_module)
             # print(inspect.getsource(test_module))
@@ -141,6 +145,7 @@ class MutationController(views.ViewNotifier):
 
             except TestsFailAtOriginal as e:
                 # If test case doesn't pass initially.
+                print('\nError Message: ')
                 print(e.result.get_exception_traceback())
                 passedInitially = False
                 errorMessage = e.result.get_exception_traceback()
@@ -258,7 +263,7 @@ class MutationController(views.ViewNotifier):
 
 
         # Replace this with the output of the LLM
-        # function_definition = "def test_comMul2(self):\n \
+        # function_deftest = "def test comMul2(self):\n \
         #     data = np.random.rand(2,3).astype(np.complex128)\n \
         #     df = pd.DataFrame(data)\n \
         #     num = np.complex64(np.random.rand())\n \
@@ -268,28 +273,35 @@ class MutationController(views.ViewNotifier):
 
         # print(function_def)
 
-        module_node = ast.parse(function_def)
-        func_node = module_node.body[0]
-        for node in test_ast.body:
-            if isinstance(node, ast.ClassDef): 
-                node.body.append(func_node)
-                break
-        # print(ast.dump(func_node, indent=4))
-        # print(test_ast.body[0])
-        uptest = ast.unparse(test_ast)
+        try:
+            module_node = ast.parse(function_def)
+            # module_node = ast.parse(function_deftest)
+        except SyntaxError as e: 
+            error_syntax = f"Syntax error: {e}"
+            return error_syntax
+        else: 
+            module_node = ast.parse(function_def)
+            func_node = module_node.body[0]
+            for node in test_ast.body:
+                if isinstance(node, ast.ClassDef): 
+                    node.body.append(func_node)
+                    break
+            # print(ast.dump(func_node, indent=4))
+            # print(test_ast.body[0])
+            uptest = ast.unparse(test_ast)
 
-        file_name = "llmtestsuite" + str(self.counter) + ".py"
-        # print(file_name)
-        self.counter+=1
-        with open(file_name, "w") as f:
-            f.write(uptest)
-        # Check if new test passes initially
-        # print(uptest)
-        # print(test_modules)
-        # print(number_of_tests)
-        return file_name
-        # print(mutant_ast)
-        # print(mutant_module)
+            file_name = "llmtestsuite" + str(self.counter) + ".py"
+            # print(file_name)
+            self.counter+=1
+            with open(file_name, "w") as f:
+                f.write(uptest)
+            # Check if new test passes initially
+            # print(uptest)
+            # print(test_modules)
+            # print(number_of_tests)
+            return file_name
+            # print(mutant_ast)
+            # print(mutant_module)
 
     def prompt_llm(self, diff_code, test_suite):
 
@@ -349,7 +361,7 @@ class MutationController(views.ViewNotifier):
             The goal is to catch and kill the mutation while making sure the generated test case still passes initially.\
             This means that the test case passes initially and fails when a mutation is applied to the code.\
             The test case should not only pass initially without the mutation, but kill the mutation as well. Only respond with the test case itself with no explanations or extra.\
-            The response should start with def ... and the test case should follow the syntax for a Python unit test test case."}
+            The response should start with def ... and the test case should follow the syntax for a Python unit test test case."} 
             # {"role": "system", "content": "Only respond with a single test case. Do not respond with the thinking unless asked. I will give some few shot examples of sample mutations as well as sample test cases.\
             # The test cases are meant for syntax purposes and is a Python unit test test case.\
             # I will also give some valid responses.\
@@ -488,18 +500,6 @@ class MutationController(views.ViewNotifier):
             return text
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     def inject_coverage(self, target_ast, target_module):
         return self.runner.inject_coverage(target_ast, target_module)
 
@@ -541,19 +541,28 @@ class MutationController(views.ViewNotifier):
 
         #Prompt LLM, get test case, run it initially. 
         #count: number of times to reprompt when failing initially
+        # UNCOMMENT HERE
         if(result!=None and result.is_survived==True):
             count = 0
             function_def = self.prompt_llm(diff_code, test_suite)
             fileName = self.create_suite(test_suite, function_def)
             #test the output
-            test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
-            print(passedInitially)
-            print(number_of_tests)
+            if fileName[0]=='S':
+                passedInitially = False
+                errorMessage = fileName
+            else: 
+                test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
+            print("Passed initially: " + str(passedInitially))
+            # print(number_of_tests)
             while(passedInitially==False and count<2):
                 print("Count: " + str(count))
                 function_def_updated = self.reprompt(errorMessage, diff_code)
                 fileName = self.create_suite(test_suite, function_def_updated)
-                test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
+                if fileName[0]=='S':
+                    errorMessage=fileName
+                    passedInitially=False
+                else: 
+                    test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
                 count+=1
             if(passedInitially==True):
                 suite = self.runner.create_llm_test_suite(mutant_module, fileName)
@@ -563,20 +572,30 @@ class MutationController(views.ViewNotifier):
                 if(result.killer=="None"):
                     func_def = self.reprompt_passed(diff_code)
                     fileName = self.create_suite(test_suite, func_def)
-                    test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
+                    if fileName[0]=='S':
+                        errorMessage=fileName
+                        passedInitially=False
+                    else: 
+                        test_modules, total_duration, number_of_tests, passedInitially, errorMessage = self.new_load_and_test(fileName)
                     if(passedInitially==False):
                         print("Did not pass initially after change.")
-                        suite = self.runner.create_llm_test_suite(mutant_module, fileName)
-                        # print(suite.suite)
-                        result, total_duration = self.run_test_again_with_mutant(total_duration, mutant_module, mutations, coverage_result, test_suite, suite)
-                        # if(type(result)!=None):
-                            # print(result.killer)
+                        if fileName[0]!='S':
+                            suite = self.runner.create_llm_test_suite(mutant_module, fileName)
+                            # print(suite.suite)
+                            result, total_duration = self.run_test_again_with_mutant(total_duration, mutant_module, mutations, coverage_result, test_suite, suite)
+                            if(type(result)!=type(None)):
+                                print("Partially correct:" + result.killer)
+                                result.is_survived=True
+                        else:
+                            print("SYNTAX ERROR HERE")
                     else:
                         print("Passed intitially, checking")
                         suite = self.runner.create_llm_test_suite(mutant_module, fileName)
                         # print(suite.suite)
                         result, total_duration = self.run_test_again_with_mutant(total_duration, mutant_module, mutations, coverage_result, test_suite, suite)
-                        if(type(result)!=None):
+                        if(result.is_survived==True):
+                            print("Survived")
+                        else:
                             print("killed with "+ result.killer)
             else: 
                 print("Skipped, did not pass even with reprompt.")

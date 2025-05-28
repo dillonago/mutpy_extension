@@ -1,86 +1,86 @@
 Start mutation process:
-  -targets: simple
-  -tests: simple_test
+  -targets: simple.py
+  -tests: simple_test.py
 Adding to dashboard:
-[#   1] AOR simple:[0.00633 s] killed by test_mul (simple_test.test_simple.test_mul)
+[#   1] AOR simple:[0.00410 s] killed by test_mul (simple_test.test_simple.test_mul)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 6, in test_mul
     self.assertEqual(mul(2, 2), 4)
 AssertionError: 1.0 != 4
 ----------------------------------------------------------------------------------------------------
-[#   2] AOR simple:[0.00540 s] killed by test_mul (simple_test.test_simple.test_mul)
+[#   2] AOR simple:[0.00408 s] killed by test_mul (simple_test.test_simple.test_mul)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 6, in test_mul
     self.assertEqual(mul(2, 2), 4)
 AssertionError: 1 != 4
 ----------------------------------------------------------------------------------------------------
-[#   3] AOR simple:[0.00451 s] killed by test_mul3 (llmtestsuite0.test_simple.test_mul3)
+[#   3] AOR simple:[0.00405 s] killed by test_mul_mutation (llmtestsuite0.test_simple.test_mul_mutation)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite0.py", line 22, in test_mul3
+  File "/home/ec2-user/mutpy_extension/llmtestsuite0.py", line 22, in test_mul_mutation
     self.assertEqual(mul(2, 3), 6)
 AssertionError: 8 != 6
 ----------------------------------------------------------------------------------------------------
-[#   4] AOR simple:[0.00417 s] killed by test_division (llmtestsuite1.test_simple.test_division)
+[#   4] AOR simple:[0.00321 s] killed by test_division_mutation (llmtestsuite1.test_simple.test_division_mutation)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite1.py", line 22, in test_division
+  File "/home/ec2-user/mutpy_extension/llmtestsuite1.py", line 22, in test_division_mutation
     self.assertEqual(div(10, 3), 3.3333333333333335)
 AssertionError: 3 != 3.3333333333333335
 ----------------------------------------------------------------------------------------------------
-[#   5] AOR simple:[0.00611 s] killed by test_div (simple_test.test_simple.test_div)
+[#   5] AOR simple:[0.00417 s] killed by test_div (simple_test.test_simple.test_div)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 9, in test_div
     self.assertEqual(div(2, 2), 1)
 AssertionError: 4 != 1
 ----------------------------------------------------------------------------------------------------
-[#   6] AOR simple:[0.00400 s] killed by test_simple_eq (llmtestsuite2.test_simple.test_simple_eq)
+[#   6] AOR simple:[0.00331 s] killed by test_simple_eq_mutation (llmtestsuite2.test_simple.test_simple_eq_mutation)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite2.py", line 22, in test_simple_eq
-    self.assertEqual(simple_eq(2, 1), 4)
-AssertionError: 2 != 4
+  File "/home/ec2-user/mutpy_extension/llmtestsuite2.py", line 22, in test_simple_eq_mutation
+    self.assertEqual(simple_eq(2, 3), 6)
+AssertionError: 0 != 6
 ----------------------------------------------------------------------------------------------------
-[#   7] AOR simple:[0.00501 s] killed by test_simple_eq (simple_test.test_simple.test_simple_eq)
+[#   7] AOR simple:[0.00381 s] killed by test_simple_eq (simple_test.test_simple.test_simple_eq)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 12, in test_simple_eq
     self.assertTrue(simple_eq(1,0) > 0)
 AssertionError: False is not true
 ----------------------------------------------------------------------------------------------------
-[#   8] AOR simple:[0.00444 s] killed by test_arr (simple_test.test_simple.test_arr)
+[#   8] AOR simple:[0.00381 s] killed by test_arr (simple_test.test_simple.test_arr)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 15, in test_arr
     self.assertEqual(arr_mul([2, 2, 2]), 12)
 AssertionError: 3.0 != 12
 ----------------------------------------------------------------------------------------------------
-[#   9] AOR simple:[0.00483 s] killed by test_arr (simple_test.test_simple.test_arr)
+[#   9] AOR simple:[0.00373 s] killed by test_arr (simple_test.test_simple.test_arr)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 15, in test_arr
     self.assertEqual(arr_mul([2, 2, 2]), 12)
 AssertionError: 3 != 12
 ----------------------------------------------------------------------------------------------------
-[#  10] AOR simple:[0.00447 s] killed by test_arr_mul (llmtestsuite3.test_simple.test_arr_mul)
+[#  10] AOR simple:[0.00305 s] killed by test_arr_mul (llmtestsuite3.test_simple.test_arr_mul)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite3.py", line 22, in test_arr_mul
-    self.assertEqual(arr_mul([1, 2, 3]), 12)
+  File "/home/ec2-user/mutpy_extension/llmtestsuite3.py", line 23, in test_arr_mul
+    self.assertEqual(arr_mul(arr), sum((x * 2 for x in arr)))
 AssertionError: 14 != 12
 ----------------------------------------------------------------------------------------------------
-[#  11] AOR simple:[0.00448 s] killed by test_simple_eq2 (llmtestsuite4.test_simple.test_simple_eq2)
+[#  11] AOR simple:[0.00342 s] killed by test_simple_eq2 (llmtestsuite5.test_simple.test_simple_eq2)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite4.py", line 22, in test_simple_eq2
-    self.assertEqual(simple_eq2(3, 2), 2.5)
-AssertionError: 2 != 2.5
+  File "/home/ec2-user/mutpy_extension/llmtestsuite5.py", line 24, in test_simple_eq2
+    self.assertAlmostEqual(simple_eq2(x, y), 4.333333333333333, places=5)
+AssertionError: 4 != 4.333333333333333 within 5 places (0.33333333333333304 difference)
 ----------------------------------------------------------------------------------------------------
-[#  12] AOR simple:[0.00407 s] killed by test_simple_eq2 (llmtestsuite5.test_simple.test_simple_eq2)
+[#  12] AOR simple:[0.00339 s] killed by test_kill_mutation (llmtestsuite6.test_simple.test_kill_mutation)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite5.py", line 22, in test_simple_eq2
-    self.assertEqual(simple_eq2(4, 2), 3)
-AssertionError: 9 != 3
+  File "/home/ec2-user/mutpy_extension/llmtestsuite6.py", line 24, in test_kill_mutation
+    self.assertAlmostEqual(simple_eq2(x, y), x / y + 1)
+AssertionError: 5 != 2.0 within 7 places (3.0 difference)
 ----------------------------------------------------------------------------------------------------
-[#  13] AOR simple:[0.00390 s] killed by test_simple_eq2 (llmtestsuite6.test_simple.test_simple_eq2)
+[#  13] AOR simple:[0.00338 s] killed by test_simple_eq2 (llmtestsuite7.test_simple.test_simple_eq2)
 Traceback (most recent call last):
-  File "/home/ec2-user/mutpy_extension/llmtestsuite6.py", line 22, in test_simple_eq2
-    self.assertEqual(simple_eq2(2, 1), 3)
+  File "/home/ec2-user/mutpy_extension/llmtestsuite7.py", line 24, in test_simple_eq2
+    self.assertEqual(simple_eq2(x, y), 3)
 AssertionError: 1.0 != 3
 ----------------------------------------------------------------------------------------------------
-[#  14] ASR simple:[0.00429 s] killed by test_arr (simple_test.test_simple.test_arr)
+[#  14] ASR simple:[0.00354 s] killed by test_arr (simple_test.test_simple.test_arr)
 Traceback (most recent call last):
   File "/home/ec2-user/mutpy_extension/simple_test.py", line 15, in test_arr
     self.assertEqual(arr_mul([2, 2, 2]), 12)

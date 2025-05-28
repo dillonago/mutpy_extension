@@ -1,6 +1,23 @@
-MutPy Extension Instructions
+MutPy Extension (Kill Survived Mutants)
 =====
 
+This extension prompts an LLM to generate test cases that will kill survived mutations. This project was for a Capstone Project at UCLA by Dillon Go, 
+and was advised by Miryung Kim and Ben Limpanukorn.  
+
+To setup this extension of MutPy, clone the repository and install. 
+
+``$ git clone https://github.com/dillonago/mutpy_extension.git``
+
+``$ cd mutpy_extension``
+
+``$ pip3 install .``
+
+To run and test MutPy, the steps will now be the same as previous instructions. 
+
+
+MutPy Extension (Mutators) Instructions
+=====
+This extension introduced new mutators to the vanilla version of MutPy. This was a project for CS230 at UCLA by Dillon Go, Nathan Huey, Jai Parera, and Weizhen Wang.
 We will be going over how to setup, run, and test MutPy.
 
 First clone this repository and install MutPy.
@@ -291,7 +308,8 @@ Licensed under the Apache License, Version 2.0. See LICENSE file.
 
 MutPy was developed as part of engineer's and master’s thesis at
 Institute of Computer Science, Faculty of Electronics and Information
-Technology, Warsaw University of Technology.
+Technology, Warsaw University of Technology. Extensions were made to the original
+MutPy by masters students from the University of California, Los Angeles. 
 
 .. |Python Versions| image:: https://img.shields.io/pypi/pyversions/MutPy.svg
    :target: https://github.com/mutpy/mutpy
