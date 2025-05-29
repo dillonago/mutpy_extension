@@ -4,11 +4,13 @@ MutPy Extension (Kill Survived Mutants)
 This extension prompts an LLM to generate test cases that will kill survived mutations. This project was for a Capstone Project at UCLA by Dillon Go, 
 and was advised by Miryung Kim and Ben Limpanukorn.  
 
-To setup this extension of MutPy, clone the repository and install. 
+To setup this extension of MutPy, clone the repository. 
 
 ``$ git clone https://github.com/dillonago/mutpy_extension.git``
 
 ``$ cd mutpy_extension``
+
+From here, create an environment file in this directory and insert your API key. After doing so, you may install.  
 
 ``$ pip3 install .``
 

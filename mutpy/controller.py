@@ -3,6 +3,7 @@ import sys
 import time
 
 import groq
+from dotenv import load_dotenv
 import os
 import ast
 import pprint
@@ -85,7 +86,8 @@ class MutationController(views.ViewNotifier):
         self.stdout_manager = utils.StdoutManager(disable_stdout)
         self.mutation_number = mutation_number
         self.test_new_loader = utils.ModulesLoader(['llmtestsuite'], None)
-        self.client = groq.Client(api_key="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")
+        # self.client = groq.Client(api_key="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")
+        self.client = None
         self.history = []
         self.counter = 0
         self.runner = runner_cls(
@@ -106,6 +108,9 @@ class MutationController(views.ViewNotifier):
             sys.exit(-2)
 
     def run_mutation_process(self):
+        load_dotenv(dotenv_path="/home/ec2-user/mutpy_extension/.env")
+        self.client = groq.Client(api_key=os.getenv("API_KEY"))
+        
         try:
             test_modules, total_duration, number_of_tests = self.load_and_check_tests()
 
